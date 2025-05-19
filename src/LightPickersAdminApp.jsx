@@ -1,9 +1,13 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
+
+import AdminLayout from "@layouts/AdminLayout";
 
 function LightPickersAdminApp() {
   return (
     <div>
-      <h1>這裡是拾光堂管理者頁面</h1>
+      <AdminLayout />
+      <Outlet />
     </div>
   );
 }
