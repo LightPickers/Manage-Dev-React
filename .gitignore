@@ -26,3 +26,7 @@ dist-ssr
 # 環境變數
 .env*
 !.env.example
+
+# Prettier/ESLint cache
+.prettiercache
+.eslintcache

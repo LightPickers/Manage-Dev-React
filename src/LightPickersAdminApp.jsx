@@ -1,6 +1,6 @@
 import React from "react";
 
-function App() {
+function LightPickersAdminApp() {
   return (
     <div>
       <h1>這裡是拾光堂管理者頁面</h1>
@@ -8,4 +8,4 @@ function App() {
   );
 }
 
-export default App;
+export default LightPickersAdminApp;
