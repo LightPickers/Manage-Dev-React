@@ -1,0 +1,27 @@
+// border-variables
+// 邊線寬度沒有改，只是拿出來放在這裡方便大家確認
+$border-width: 1px;
+
+$border-widths: (
+  1: 1px,
+  2: 2px,
+  3: 3px,
+  4: 4px,
+  5: 5px,
+);
+
+// border-radius-variables
+// 圓角目前只有改 xxl，可以使用 rounded/rounded-top/rounded-end... 前綴（詳情見 _custom-utilities）
+// rounded-1
+$border-radius-sm: 0.25rem; // 4px
+// rounded-2
+$border-radius: 0.375rem; // 6px
+// rounded-3
+$border-radius-lg: 0.5rem; // 8px
+// rounded-4
+$border-radius-xl: 1rem; // 16px
+// rounded-5
+$border-radius-xxl: 100px; // 2rem !default;
+// rounded-pill
+$border-radius-pill: 50rem;
+//另有 rounded-circle => 圓形
