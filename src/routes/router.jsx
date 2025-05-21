@@ -17,19 +17,19 @@ import {
 import LightPickersAdminApp from "@/LightPickersAdminApp";
 
 const ROUTES = {
-  DASHBOARD: "dashboard",
+  DASHBOARD: "/dashboard",
   LOGIN: "login",
-  USER: "users",
-  ORDER: "orders",
+  USER: "/users",
+  ORDER: "/orders",
   PRODUCTS: {
-    LIST: "products",
-    CREATE: "products/new",
-    EDIT: "products/:productId/edit",
+    LIST: "/products",
+    CREATE: "/products/new",
+    EDIT: "/products/:productId/edit",
   },
   COUPONS: {
-    LIST: "coupons",
-    CREATE: "coupons/new",
-    EDIT: "coupons/:couponId/edit",
+    LIST: "/coupons",
+    CREATE: "/coupons/new",
+    EDIT: "/coupons/:couponId/edit",
   },
 };
 
@@ -88,7 +88,7 @@ const adminRoutes = [
     errorElement: <ErrorPage />,
   },
   {
-    path: "admin",
+    path: "/",
     element: <LightPickersAdminApp />,
     errorElement: <ErrorPage />,
     children: adminPages,
