@@ -29,7 +29,7 @@ const store = configureStore({
     auth: authReducer,
     ...apiReducers,
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware.concat(apiMiddleware),
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(apiMiddleware),
 });
 
 setupListeners(store.dispatch);
