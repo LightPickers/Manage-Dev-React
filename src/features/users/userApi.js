@@ -16,12 +16,19 @@ export const userApi = createApi({
     // 變更使用者權限
     toggleUserActiveStatus: builder.mutation({
       query: statusUpdate => ({
-        url: "/permissions",
+        url: "/users/permissions",
         method: "PATCH",
         body: statusUpdate,
       }),
     }),
+    // 取得使用者列表
+    getUsers: builder.query({
+      query: ({ page, per, keyword = "" } = {}) => {
+        const params = new URLSearchParams({ page, per, keyword });
+        return `/users?${params.toString()}`;
+      },
+    }),
   }),
 });
 
-export const { useToggleUserActiveStatusMutation } = userApi;
+export const { useToggleUserActiveStatusMutation, useGetUsersQuery } = userApi;

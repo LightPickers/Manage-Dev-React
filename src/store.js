@@ -7,6 +7,8 @@ import { productApi } from "@features/products/productApi";
 import { couponApi } from "@features/coupons/couponApi";
 import { orderApi } from "@features/orders/orderApi";
 import { userApi } from "@features/users/userApi";
+import { uploadApi } from "@features/upload/uploadApi";
+import { productAttributesApi } from "@features/products/productAttributesApi";
 
 const apiReducers = {
   [authApi.reducerPath]: authApi.reducer,
@@ -14,6 +16,8 @@ const apiReducers = {
   [couponApi.reducerPath]: couponApi.reducer,
   [orderApi.reducerPath]: orderApi.reducer,
   [userApi.reducerPath]: userApi.reducer,
+  [uploadApi.reducerPath]: uploadApi.reducer,
+  [productAttributesApi.reducerPath]: productAttributesApi.reducer,
 };
 
 const apiMiddleware = [
@@ -22,6 +26,8 @@ const apiMiddleware = [
   couponApi.middleware,
   orderApi.middleware,
   userApi.middleware,
+  uploadApi.middleware,
+  productAttributesApi.middleware,
 ];
 
 const store = configureStore({
