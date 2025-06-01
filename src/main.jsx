@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "react-toastify/dist/ReactToastify.css";
 import "@assets/all.scss";
 
