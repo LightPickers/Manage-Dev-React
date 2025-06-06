@@ -1,8 +1,10 @@
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
 
 import { useUploadImageMutation } from "@/features/upload/uploadApi";
 import { useCreateProductMutation } from "@/features/products/productApi";
@@ -19,11 +21,6 @@ function ProductCreatePage() {
   const [imageUrl, setImageUrl] = useState("");
   const [subImages, setSubImages] = useState([]);
 
-  // Hashtag 狀態
-  const [hashtag1, setHashtag1] = useState("");
-  const [hashtag2, setHashtag2] = useState("");
-  const [hashtag3, setHashtag3] = useState("");
-
   const [uploadImage] = useUploadImageMutation();
   const [isUploadingPrimaryImage, setIsUploadingPrimaryImage] = useState(false);
   const [isUploadingSubImages, setIsUploadingSubImages] = useState(false);
@@ -35,10 +32,13 @@ function ProductCreatePage() {
   const { data: brandsData } = useGetProductBrandsQuery();
   const brandsList = brandsData?.data || [];
 
+  const quillRef = useRef(null);
+  const [description, setDescription] = useState("");
+
   // 新增商品
   const [createProduct, { isLoading: isCreateProductLoading, error }] = useCreateProductMutation();
-  console.log("createProduct:", createProduct);
   const {
+    control,
     handleSubmit,
     register,
     setValue,
@@ -46,7 +46,52 @@ function ProductCreatePage() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(productCreateSchema),
+    defaultValues: {
+      description: "",
+    },
   });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "summary",
+  });
+
+  useEffect(() => {
+    if (fields.length === 0) append(""); // 載入時至少一行
+  }, [append, fields.length]);
+
+  useEffect(() => {
+    register("description", {
+      required: "商品完整描述為必填",
+      validate: val => val.replace(/<(.|\n)*?>/g, "").trim() !== "" || "請輸入內容",
+    });
+  }, [register]);
+
+  useEffect(() => {
+    if (quillRef.current && !quillRef.current.__quill) {
+      const quill = new Quill(quillRef.current, {
+        theme: "snow",
+        placeholder: "請輸入商品完整描述",
+      });
+
+      // 記錄實例避免重複初始化
+      quillRef.current.__quill = quill;
+
+      quill.on("text-change", () => {
+        const delta = quill.getContents();
+        setValue("description", delta);
+        trigger("description");
+      });
+    }
+  }, [setValue, trigger]);
+
+  const handleAddSummaryLine = async () => {
+    const lastIndex = fields.length - 1;
+    const isValid = await trigger(`summary.${lastIndex}`);
+    if (isValid) {
+      append("");
+    }
+  };
 
   const onSubmit = async data => {
     const hashtags = [data.hashtag1, data.hashtag2, data.hashtag3].filter(tag =>
@@ -57,12 +102,12 @@ function ProductCreatePage() {
       name: data.name,
       category_id: data.category_id,
       condition_id: data.condition_id,
-      summary: data.description_short,
-      description: data.description_full, // 或是改用 description_full 對應
+      summary: data.summary,
+      description: data.description,
       title: data.title,
       subtitle: data.subtitle,
-      is_available: data.is_available === "true", // ✅ 轉為 boolean
-      is_featured: data.is_featured === "true", // ✅ 轉為 boolean
+      is_available: data.is_available === "true",
+      is_featured: data.is_featured === "true",
       brand_id: data.brand_id,
       original_price: Number(data.original_price),
       selling_price: Number(data.selling_price),
@@ -90,7 +135,7 @@ function ProductCreatePage() {
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
-                  <Link className="text-gray-" to="/">
+                  <Link className="text-gray-" to="/dashboard">
                     首頁
                   </Link>
                 </li>
@@ -119,7 +164,7 @@ function ProductCreatePage() {
                         style={{ cursor: "pointer", display: "inline-block", textAlign: "center" }}
                       >
                         <img
-                          src={imageUrl || "uploadImage.png"}
+                          src={imageUrl || "/uploadImage.png"}
                           alt="點擊上傳"
                           className={errors.primary_image ? "border border-danger" : ""}
                           style={{
@@ -146,11 +191,11 @@ function ProductCreatePage() {
                         if (!file) return;
                         setIsUploadingPrimaryImage(true);
                         const formData = new FormData();
-                        formData.append("image", file);
+                        formData.append("files", file);
                         try {
                           const res = await uploadImage(formData).unwrap();
-                          setImageUrl(res.data.image_url);
-                          setValue("primary_image", res.data.image_url);
+                          setImageUrl(res.data.image_urls?.[0]);
+                          setValue("primary_image", res.data.image_urls?.[0]);
                           trigger("primary_image");
                           toast.success("主圖上傳成功");
                           setIsUploadingPrimaryImage(false);
@@ -192,7 +237,7 @@ function ProductCreatePage() {
                       {subImages.length < 5 && (
                         <label htmlFor="subImagesInput" style={{ cursor: "pointer" }}>
                           <img
-                            src={"uploadImage.png"}
+                            src={"/uploadImage.png"}
                             alt="點擊上傳"
                             style={{
                               width: "100px",
@@ -222,10 +267,10 @@ function ProductCreatePage() {
                         const uploadedUrls = [];
                         for (const file of files) {
                           const formData = new FormData();
-                          formData.append("image", file);
+                          formData.append("files", file);
                           try {
                             const res = await uploadImage(formData).unwrap();
-                            uploadedUrls.push(res.data.image_url);
+                            uploadedUrls.push(res.data.image_urls[0]);
                           } catch (err) {
                             console.error("圖片上傳失敗", err);
                           }
@@ -298,15 +343,40 @@ function ProductCreatePage() {
                 {/* 商品簡介 summary*/}
                 <div className="d-flex flex-column gap-4">
                   <label className="form-label m-0 fw-bold text-gray-500">商品簡介</label>
-                  <textarea
-                    className={`form-control ${errors.description_short ? "is-invalid" : ""}`}
-                    placeholder="請輸入商品簡介"
-                    style={{ resize: "vertical", minHeight: "100px" }}
-                    {...register("description_short")}
-                  />
-                  {errors.description_short && (
-                    <div className="invalid-feedback m-0">{errors.description_short.message}</div>
-                  )}
+
+                  {fields.map((field, index) => (
+                    <div key={field.id} className="d-flex flex-column gap-1">
+                      <div className="d-flex gap-4 align-items-center">
+                        <input
+                          type="text"
+                          className={`form-control ${errors.summary?.[index] ? "is-invalid" : ""}`}
+                          placeholder={`請輸入商品簡介（第 ${index + 1} 行）`}
+                          {...register(`summary.${index}`)}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger btn-sm rounded-2"
+                          style={{ minWidth: "50px" }}
+                          onClick={() => remove(index)}
+                        >
+                          移除
+                        </button>
+                      </div>
+                      {errors.summary?.[index] && (
+                        <div className="invalid-feedback d-block">
+                          {errors.summary[index].message}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="btn btn-custom-primary w-fit rounded-2 py-2 border-0 shadow-none"
+                    onClick={handleAddSummaryLine}
+                  >
+                    + 新增一行簡介
+                  </button>
                 </div>
 
                 {/* 商品描述標題 title*/}
@@ -337,17 +407,21 @@ function ProductCreatePage() {
                   )}
                 </div>
 
-                {/* 商品完整描述 react quill */}
-                <div className="d-flex flex-column gap-4">
-                  <label className="form-label m-0 fw-bold text-gray-500">商品完整描述</label>
-                  <textarea
-                    className={`form-control ${errors.description_full ? "is-invalid" : ""}`}
-                    placeholder="請輸入商品完整描述"
-                    style={{ resize: "vertical", minHeight: "100px" }}
-                    {...register("description_full")}
-                  />
-                  {errors.description_full && (
-                    <div className="invalid-feedback m-0">{errors.description_full.message}</div>
+                {/* 商品完整描述 quill */}
+                <div className="d-flex flex-column gap-2">
+                  <label className="form-label fw-bold text-gray-500">商品完整描述</label>
+
+                  <div
+                    className={`quill-wrapper border rounded-top-2 ${errors.description ? "border-danger" : "border-secondary"}`}
+                  >
+                    <div
+                      ref={quillRef}
+                      className="quill-editor bg-white rounded-bottom-2 border-0"
+                    />
+                  </div>
+
+                  {errors.description && (
+                    <div className="text-danger small">{errors.description.message}</div>
                   )}
                 </div>
 
