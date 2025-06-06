@@ -1,56 +1,79 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+
+import { logout } from "@/features/auth/authSlice";
 
 function Header() {
   const navigate = useNavigate();
+  const user = useSelector(state => state.auth.user);
   const ADMIN_APP_BASE = import.meta.env.VITE_ADMIN_APP_BASE;
+  const dispatch = useDispatch();
 
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem("token");
+
+    toast.success("已成功登出");
+    Promise.resolve().then(() => {
+      navigate("/login", { replace: true });
+    });
+  };
   return (
-    <div className="bg-white">
+    <nav className="navbar navbar-expand-lg bg-white navbar-light bg-light fixed-top py-5">
       <div className="container">
-        <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top py-5">
-          <div className="container">
-            <a className="navbar-brand" href="/">
-              <img src={`${ADMIN_APP_BASE}Logo.svg`} alt="拾光堂 logo" />
-            </a>
-            <button
-              className="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarSupportedContent"
-              aria-controls="navbarSupportedContent"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
-            <div className="collapse navbar-collapse bg-white" id="navbarSupportedContent">
-              <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li className="nav-item">
-                  <Link className="nav-link" aria-current="page" to="/users">
-                    使用者管理
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/products">
-                    商品列表
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/orders">
-                    訂單管理
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/coupons">
-                    優惠券管理
-                  </Link>
-                </li>
-              </ul>
-            </div>
+        <Link className="navbar-brand" to="/dashboard">
+          <img src={`${ADMIN_APP_BASE}Logo.svg`} alt="拾光堂 logo" />
+        </Link>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <div className="d-flex flex-column flex-lg-row align-items-center gap-4 ms-auto">
+            <ul className="navbar-nav text-center fw-bold gap-4">
+              <li className="nav-item">
+                <Link className="nav-link" aria-current="page" to="/users">
+                  會員管理
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/products">
+                  商品列表
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/orders">
+                  訂單管理
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/coupons">
+                  優惠券管理
+                </Link>
+              </li>
+            </ul>
+
+            {user ? (
+              <button className="btn btn-custom-primary small" onClick={handleLogout}>
+                登出
+              </button>
+            ) : (
+              <button className="btn btn-custom-primary small" as={Link} to="/login">
+                登入
+              </button>
+            )}
           </div>
-        </nav>
+        </div>
       </div>
-    </div>
+    </nav>
   );
 }
 
