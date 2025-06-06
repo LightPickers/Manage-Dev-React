@@ -1,5 +1,7 @@
 // router.jsx
 import { createHashRouter } from "react-router-dom";
+import { element } from "prop-types";
+import { Navigate } from "react-router-dom";
 
 import {
   LoginPage,
@@ -15,6 +17,7 @@ import {
   ErrorPage,
 } from "@pages";
 import LightPickersAdminApp from "@/LightPickersAdminApp";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const ROUTES = {
   DASHBOARD: "/dashboard",
@@ -91,7 +94,16 @@ const adminRoutes = [
     path: "/",
     element: <LightPickersAdminApp />,
     errorElement: <ErrorPage />,
-    children: adminPages,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/dashboard" />,
+      },
+      {
+        element: <ProtectedRoute />,
+        children: adminPages,
+      },
+    ],
   },
 ];
 const adminRouter = createHashRouter(adminRoutes);
