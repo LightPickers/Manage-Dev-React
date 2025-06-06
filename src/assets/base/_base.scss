@@ -13,7 +13,7 @@ body {
   line-height: lh.$line-height-base;
   color: colors.$primary-1000;
   background-color: colors.$gray-100;
-  // margin-top: 88px; // 預留導覽列空間
+  margin-top: 88px; // 預留導覽列空間
 }
 
 img {
@@ -226,4 +226,23 @@ h6 {
 // 標題下底線
 .divider-line {
   border-bottom: 1px solid colors.$gray-200;
+}
+
+// quill 樣式
+.ql-tooltip {
+  display: none;
+}
+.quill-wrapper .ql-editor::before {
+  font-style: normal;
+  color: #6c757d;
+}
+.quill-wrapper .ql-toolbar.ql-snow {
+  border: 0;
+}
+
+.quill-wrapper .ql-editor {
+  resize: vertical;
+  min-height: 200px;
+  overflow: auto;
+  background-color: #fff;
 }

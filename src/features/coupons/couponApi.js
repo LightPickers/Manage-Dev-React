@@ -16,7 +16,10 @@ export const couponApi = createApi({
   endpoints: builder => ({
     // 取得優惠券列表
     getCoupons: builder.query({
-      query: () => "/coupons",
+      query: ({ page, per, keyword = "" } = {}) => {
+        const params = new URLSearchParams({ page, per, keyword });
+        return `/coupons?${params.toString()}`;
+      },
       providesTags: result =>
         result?.data
           ? [

@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { useGetUsersQuery, useToggleUserActiveStatusMutation } from "@features/users/userApi";
 
 function UserListPage() {
+  const defaultAvatar = name =>
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=D8E8E8&size=60`;
   const [currentPage, setPage] = useState(1);
   const [keyword, setKeyword] = useState("");
   const { data, isLoading, error, refetch } = useGetUsersQuery({
@@ -92,8 +94,7 @@ function UserListPage() {
                       <td className="user-list-item-last col-4">
                         <div className="d-flex align-items-center gap-6 p-3">
                           <img
-                            // 先放假圖 要改回去item.primary_image
-                            src={"https://picsum.photos/id/230/60/60"}
+                            src={users.photo || defaultAvatar(users.name)}
                             alt={users.name}
                             className="rounded-circle"
                             width="60"
@@ -178,9 +179,11 @@ function UserListPage() {
                 {users.map(users => (
                   <div key={users.id} className="d-flex flex-row gap-3">
                     <img
-                      className="rounded-circle"
-                      src="https://picsum.photos/id/230/60/60"
+                      src={users.photo || defaultAvatar(users.name)}
                       alt={users.name}
+                      className="rounded-circle"
+                      height="60"
+                      width="60"
                     />
                     <div className="d-flex flex-column justify-content-between w-100">
                       <div className="d-flex justify-content-between align-items-center">
