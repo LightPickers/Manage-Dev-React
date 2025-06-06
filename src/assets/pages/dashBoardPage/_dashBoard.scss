@@ -1,0 +1,9 @@
+@use "../../stylesheets/fonts" as fonts;
+@use "../../stylesheets/colors" as colors;
+@use "../../stylesheets/sizes" as sizes;
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
