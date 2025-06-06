@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // 前台產品相關 API
 export const productAttributesApi = createApi({
-  reducerPath: "productApi",
+  reducerPath: "productAttributesApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE,
   }),
