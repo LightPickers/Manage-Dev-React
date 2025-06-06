@@ -6,10 +6,20 @@ export const productCreateSchema = z.object({
   name: z.string().min(1, "商品名稱為必填"),
   category_id: z.string().min(1, "請選擇商品分類"),
   condition_id: z.string().min(1, "請選擇商品保存狀態"),
-  description_short: z.string().min(1, "商品簡介為必填"),
+  summary: z.array(z.string().min(1, "請填寫商品簡介")).min(1, "請至少填寫一項商品簡介"),
   title: z.string().min(1, "商品描述標題為必填"),
   subtitle: z.string().min(1, "商品描述副標題為必填"),
-  description_full: z.string().min(1, "商品完整描述為必填"),
+  description: z.any().refine(
+    delta =>
+      typeof delta === "object" &&
+      Array.isArray(delta.ops) &&
+      delta.ops.every(op => typeof op.insert === "string") &&
+      delta.ops
+        .map(op => op.insert)
+        .join("")
+        .trim().length > 0,
+    { message: "商品完整描述為必填" }
+  ),
   is_available: z.enum(["true", "false"], {
     required_error: "請選擇商品是否供應",
     invalid_type_error: "請選擇商品是否供應",
