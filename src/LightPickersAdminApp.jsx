@@ -1,4 +1,4 @@
-import { React, useEffect } from "react";
+import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
@@ -16,21 +16,10 @@ function LightPickersAdminApp() {
   }, [dispatch]);
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div>
       <Header />
-      <div style={{ flex: 1, paddingBottom: "60px" }}>
-        <Outlet />
-      </div>
-      <Footer
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          height: "60px",
-        }}
-      />
+      <Outlet />
+      <Footer />
     </div>
   );
 }
