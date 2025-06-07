@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
-import { setCredentials } from "../features/auth/authSlice";
-import { useLoginMutation } from "../features/auth/authApi";
 import Header from "@layouts/Header";
 import Footer from "@layouts/Footer";
+
+import { setCredentials } from "../features/auth/authSlice";
+import { useLoginMutation } from "../features/auth/authApi";
+
 function LoginPage() {
   const {
     register,
