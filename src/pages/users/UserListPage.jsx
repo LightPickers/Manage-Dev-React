@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { toast } from "react-toastify";
+import { useDebounce } from "use-debounce";
 
 import { useGetUsersQuery, useToggleUserActiveStatusMutation } from "@features/users/userApi";
 
 function UserListPage() {
-  const defaultAvatar = name =>
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=D8E8E8&size=60`;
   const [currentPage, setPage] = useState(1);
   const [keyword, setKeyword] = useState("");
-  const { data, isLoading, error, refetch } = useGetUsersQuery({
+  const [debouncedKeyword] = useDebounce(keyword, 800);
+  const { data, isLoading, refetch } = useGetUsersQuery({
     page: currentPage,
-    keyword,
+    keyword: debouncedKeyword,
   });
   const [toggleUserActiveStatus] = useToggleUserActiveStatusMutation();
   const [updatingId, setUpdatingId] = useState(null);
@@ -21,10 +21,6 @@ function UserListPage() {
   if (isLoading) {
     return <div className="container text-center py-20">載入中...</div>;
   }
-
-  // if (error) {
-  //   return <div className="container py-20 text-danger">發生錯誤，無法取得使用者資料。</div>;
-  // }
 
   return (
     <>
@@ -38,7 +34,7 @@ function UserListPage() {
                   首頁
                 </Link>
               </li>
-              <li className="breadcrumb-item active">使用者管理</li>
+              <li className="breadcrumb-item active">會員管理</li>
             </ol>
           </nav>
 
@@ -46,8 +42,8 @@ function UserListPage() {
             {/* 標題 */}
             <div className="d-flex flex-column gap-3">
               <div className="d-flex align-items-center justify-content-between">
-                <div className="d-flex align-items-end gap-4">
-                  <h3>使用者管理</h3>
+                <div className="d-flex flex-column align-align-items-lg-end-end gap-4">
+                  <h3>會員管理</h3>
                   <div>
                     <p className="fs-5 text-gray-600" style={{ letterSpacing: "0.1em" }}>
                       共{usersNumber}筆
@@ -59,12 +55,9 @@ function UserListPage() {
                   <input
                     type="text"
                     className="form-control w-auto"
-                    placeholder="搜尋姓名或 Email"
+                    placeholder="搜尋名稱或 Email"
                     value={keyword}
-                    onChange={e => {
-                      setKeyword(e.target.value);
-                      setPage(1); // 搜尋時回到第一頁
-                    }}
+                    onChange={e => setKeyword(e.target.value)}
                   />
                 </div>
               </div>
@@ -76,14 +69,13 @@ function UserListPage() {
               <thead className="user-list-table-head">
                 <tr>
                   <th scope="col-4">
-                    <p className="text-center">頭像</p>
+                    <p className="px-7">會員名稱</p>
                   </th>
-
-                  <th scope="col-4">
-                    <p>Email</p>
+                  <th scope="col-5">
+                    <p className="px-7">Email</p>
                   </th>
-                  <th scope="col-4" style={{ paddingRight: "0px", width: "306px" }}>
-                    <p>是否停權</p>
+                  <th scope="col-3" style={{ paddingRight: "0px", width: "306px" }}>
+                    <p className="px-7">是否停權</p>
                   </th>
                 </tr>
               </thead>
@@ -93,32 +85,21 @@ function UserListPage() {
                     <tr key={users.id}>
                       <td className="user-list-item-last col-4">
                         <div className="d-flex align-items-center gap-6 p-3">
-                          <img
-                            src={users.photo || defaultAvatar(users.name)}
-                            alt={users.name}
-                            className="rounded-circle"
-                            width="60"
-                          />
-                          <div>
-                            <p className="fs-5 text-gray-600" style={{ letterSpacing: "0.1em" }}>
-                              {users.name}
-                            </p>
-                          </div>
+                          <p className="fs-5 text-gray-600 px-4" style={{ letterSpacing: "0.1em" }}>
+                            {users.name}
+                          </p>
                         </div>
                       </td>
-
                       <td
-                        className={
-                          "user-list-item-last text-end text-gray-500 fs-5 px-5 py-3 gap-3 col-4"
-                        }
+                        className={"user-list-item-last text-gray-500 fs-5 px-5 py-3 gap-3 col-5"}
                       >
-                        {users.email}
+                        <p className="px-4">{users.email}</p>
                       </td>
                       <td
-                        className="user-list-item-last col-4"
+                        className="user-list-item-last col-3"
                         style={{ paddingRight: "0px", width: "306px" }}
                       >
-                        <div className="d-flex justify-content-end align-items-center p-3 gap-1">
+                        <div className="d-flex align-items-center px-7">
                           <div
                             className="fs-5 fw-bold text-gray-500"
                             style={{ letterSpacing: "0.1em" }}
@@ -139,7 +120,7 @@ function UserListPage() {
                                       is_banned: !users.is_banned,
                                     }).unwrap();
                                     toast.success("使用者狀態已更新");
-                                  } catch (error) {
+                                  } catch {
                                     toast.error("更新失敗，請稍後再試");
                                   }
                                   await refetch();
@@ -147,7 +128,8 @@ function UserListPage() {
                                 }}
                               />
                               <label
-                                className={`form-check-label ${users.is_banned ? "text-danger" : ""}`}
+                                className={`form-check-label text-end ${users.is_banned ? "text-danger" : ""}`}
+                                style={{ minWidth: "100px" }}
                                 htmlFor={`banSwitch-${users.id}`}
                               >
                                 {updatingId === users.id ? (
@@ -157,7 +139,7 @@ function UserListPage() {
                                       role="status"
                                       aria-hidden="true"
                                     ></span>
-                                    更新中...
+                                    更新中
                                   </>
                                 ) : users.is_banned ? (
                                   "停權中"
@@ -178,17 +160,12 @@ function UserListPage() {
               <div className="d-flex flex-column gap-4">
                 {users.map(users => (
                   <div key={users.id} className="d-flex flex-row gap-3">
-                    <img
-                      src={users.photo || defaultAvatar(users.name)}
-                      alt={users.name}
-                      className="rounded-circle"
-                      height="60"
-                      width="60"
-                    />
-                    <div className="d-flex flex-column justify-content-between w-100">
+                    <div className="d-flex flex-column justify-content-between gap-2 w-100">
                       <div className="d-flex justify-content-between align-items-center">
-                        <div className="text-gray-600 text-multiline-truncate">{users.name}</div>
-                        <div className="form-check form-switch ">
+                        <div className="text-gray-600 fs-3 fw-bold text-multiline-truncate">
+                          {users.name}
+                        </div>
+                        <div className="form-check form-switch">
                           <input
                             className="form-check-input"
                             type="checkbox"
@@ -204,7 +181,7 @@ function UserListPage() {
                                   is_banned: !users.is_banned,
                                 }).unwrap();
                                 toast.success("使用者狀態已更新");
-                              } catch (error) {
+                              } catch {
                                 toast.error("更新失敗，請稍後再試");
                               }
                               await refetch();
@@ -212,7 +189,8 @@ function UserListPage() {
                             }}
                           />
                           <label
-                            className={`form-check-label ${users.is_banned ? "text-danger" : ""}`}
+                            className={`form-check-label text-end ${users.is_banned ? "text-danger" : ""}`}
+                            style={{ minWidth: "80px" }}
                             htmlFor={`banSwitch-${users.id}`}
                           >
                             {updatingId === users.id ? (
@@ -222,7 +200,7 @@ function UserListPage() {
                                   role="status"
                                   aria-hidden="true"
                                 ></span>
-                                更新中...
+                                更新中
                               </>
                             ) : users.is_banned ? (
                               "停權中"
@@ -239,11 +217,11 @@ function UserListPage() {
                           </div>
                         </div>
                       </div>
+                      <div className="divider-line"></div>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="divider-line"></div>
             </div>
 
             {/* 頁碼 */}
