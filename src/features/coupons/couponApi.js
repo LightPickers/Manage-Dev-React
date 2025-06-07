@@ -5,7 +5,7 @@ export const couponApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_ADMIN_API_BASE,
     prepareHeaders: (headers, { getState }) => {
-      const token = getState().auth?.token;
+      const token = getState().auth.token;
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }
@@ -14,11 +14,13 @@ export const couponApi = createApi({
   }),
   tagTypes: ["Coupon"],
   endpoints: builder => ({
-    // 取得優惠券列表
     getCoupons: builder.query({
       query: ({ page, per, keyword = "" } = {}) => {
-        const params = new URLSearchParams({ page, per, keyword });
-        return `/coupons?${params.toString()}`;
+        const params = new URLSearchParams();
+        if (page) params.append("page", page);
+        if (per) params.append("per", per);
+        if (keyword) params.append("keyword", keyword);
+        return `/coupons?${params}`;
       },
       providesTags: result =>
         result?.data
@@ -49,7 +51,22 @@ export const couponApi = createApi({
         method: "PUT",
         body: updatedCoupon,
       }),
-      invalidatesTags: (result, error, { couponId }) => [{ type: "Coupon", id: couponId }],
+      invalidatesTags: (result, error, { couponId }) => [
+        { type: "Coupon", id: couponId },
+        { type: "Coupon", id: "LIST" },
+      ],
+    }),
+    // 切換優惠券啟用狀態
+    toggleCouponActiveStatus: builder.mutation({
+      query: ({ id, is_available }) => ({
+        url: `/coupons/${id}`,
+        method: "PATCH",
+        body: { is_available },
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: "Coupon", id },
+        { type: "Coupon", id: "LIST" },
+      ],
     }),
     // 刪除優惠券
     deleteCouponById: builder.mutation({
@@ -72,4 +89,5 @@ export const {
   useGetCouponsQuery,
   usePrefetch,
   useUpdateCouponMutation,
+  useToggleCouponActiveStatusMutation,
 } = couponApi;
