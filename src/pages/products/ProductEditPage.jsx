@@ -305,7 +305,7 @@ function ProductEditPage() {
                       {subImages.length < 5 && (
                         <label htmlFor="subImagesInput" style={{ cursor: "pointer" }}>
                           <img
-                            src={"/uploadImage.png"}
+                            src={`${ADMIN_APP_BASE}uploadImage.png`}
                             alt="點擊上傳"
                             style={{
                               width: "100px",
