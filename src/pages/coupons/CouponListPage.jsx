@@ -42,8 +42,10 @@ function CouponListPage() {
   const [deleteCoupon] = useDeleteCouponByIdMutation();
   const [deletingId, setDeletingId] = useState(null);
 
-  // 取得所有優惠券資料
-  const allCoupons = data?.data || [];
+  // 使用 useMemo 來包裝 allCoupons
+  const allCoupons = useMemo(() => {
+    return data?.data || [];
+  }, [data]);
 
   // 前端分頁邏輯
   const { paginatedCoupons, totalPages, pageInfo } = useMemo(() => {
