@@ -16,10 +16,21 @@ function LightPickersAdminApp() {
   }, [dispatch]);
 
   return (
-    <div>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <Header />
-      <Outlet />
-      <Footer />
+      <div style={{ flex: 1, paddingBottom: "60px" }}>
+        <Outlet />
+      </div>
+      <Footer
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000,
+          height: "60px",
+        }}
+      />
     </div>
   );
 }

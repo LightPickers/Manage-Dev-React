@@ -1,0 +1,78 @@
+// 優惠券開關樣式
+.form-check-input:checked {
+  background-color: #8bb0b7 !important;
+  border-color: #8bb0b7 !important;
+}
+
+.form-check-input:focus {
+  border-color: #8bb0b7 !important;
+  box-shadow: 0 0 0 0.25rem rgba(139, 176, 183, 0.25) !important;
+}
+
+.form-check-input:checked:focus {
+  box-shadow: 0 0 0 0.25rem rgba(139, 176, 183, 0.25) !important;
+}
+
+// 數字輸入框樣式 - 隱藏箭頭
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+// 優惠券頁面按鈕樣式
+.coupon-btn-cancel {
+  background-color: white !important;
+  border-color: #6c757d !important;
+  color: #6c757d !important;
+
+  &:hover {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: white !important;
+  }
+}
+
+.coupon-btn-submit {
+  background-color: #8bb0b7 !important;
+  border-color: #8bb0b7 !important;
+  color: white !important;
+
+  &:hover:not(:disabled) {
+    background-color: #7a9fa6 !important;
+    border-color: #7a9fa6 !important;
+    color: white !important;
+  }
+
+  &:disabled {
+    background-color: #8bb0b7 !important;
+    border-color: #8bb0b7 !important;
+    opacity: 0.6;
+  }
+}
+
+// 建立優惠券按鈕樣式
+.coupon-btn-create {
+  background-color: #8bb0b7 !important;
+  border-color: #8bb0b7 !important;
+  color: white !important;
+
+  &:hover {
+    background-color: #7a9fa6 !important;
+    border-color: #7a9fa6 !important;
+    color: white !important;
+  }
+
+  &:active,
+  &:focus {
+    background-color: #6b8e95 !important;
+    border-color: #6b8e95 !important;
+    color: white !important;
+    box-shadow: 0 0 0 0.2rem rgba(139, 176, 183, 0.25) !important;
+  }
+}
