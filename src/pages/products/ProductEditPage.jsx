@@ -8,7 +8,7 @@ import "quill/dist/quill.snow.css";
 
 import { useUploadImageMutation } from "@/features/upload/uploadApi";
 import { useGetProductByIdQuery, useUpdateProductMutation } from "@/features/products/productApi";
-import { productCreateSchema } from "@/schema/productCreateSchema";
+import { productFormSchema } from "@/schemas/products/productFormSchema";
 import {
   useGetProductBrandsQuery,
   useGetProductCategoryQuery,
@@ -17,6 +17,7 @@ import {
 
 function ProductEditPage() {
   const navigate = useNavigate();
+  const ADMIN_APP_BASE = import.meta.env.VITE_ADMIN_APP_BASE;
 
   const { productId } = useParams();
   const { data: productData, isLoading: isGetProductLoading } = useGetProductByIdQuery(productId);
@@ -26,11 +27,6 @@ function ProductEditPage() {
   const [uploadImage] = useUploadImageMutation();
   const [isUploadingPrimaryImage, setIsUploadingPrimaryImage] = useState(false);
   const [isUploadingSubImages, setIsUploadingSubImages] = useState(false);
-
-  // Hashtag 狀態
-  const [hashtag1] = useState("");
-  const [hashtag2] = useState("");
-  const [hashtag3] = useState("");
 
   const { data: categoryData } = useGetProductCategoryQuery();
   const categoryList = categoryData?.data || [];
@@ -52,7 +48,7 @@ function ProductEditPage() {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(productCreateSchema),
+    resolver: zodResolver(productFormSchema),
     mode: "onBlur",
     defaultValues: {
       primary_image: "",
@@ -69,15 +65,26 @@ function ProductEditPage() {
       brand_id: "",
       original_price: "",
       selling_price: "",
-      hashtag1: "",
-      hashtag2: "",
-      hashtag3: "",
+      hashtag: [""],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields: summaryFields,
+    append: summaryAppend,
+    remove: summaryRemove,
+  } = useFieldArray({
     control,
     name: "summary",
+  });
+
+  const {
+    fields: hashtagFields,
+    append: hashtagAppend,
+    remove: hashtagRemove,
+  } = useFieldArray({
+    control,
+    name: "hashtag",
   });
 
   useEffect(() => {
@@ -119,9 +126,7 @@ function ProductEditPage() {
         original_price: String(productData.data.original_price),
         selling_price: String(productData.data.selling_price),
         primary_image: productData.data.primary_image,
-        hashtag1: productData.data.hashtags?.[0] || "",
-        hashtag2: productData.data.hashtags?.[1] || "",
-        hashtag3: productData.data.hashtags?.[2] || "",
+        hashtag: productData.data.hashtags,
       });
 
       setImageUrl(productData.data.primary_image);
@@ -130,10 +135,26 @@ function ProductEditPage() {
   }, [reset, productData]);
 
   const handleAddSummaryLine = async () => {
-    const lastIndex = fields.length - 1;
+    const lastIndex = summaryFields.length - 1;
     const isValid = await trigger(`summary.${lastIndex}`);
     if (isValid) {
-      append("");
+      summaryAppend("");
+    } else {
+      toast.error("請先填寫前 1 行簡介");
+    }
+  };
+
+  const handleAddHashtagField = async () => {
+    const lastIndex = hashtagFields.length - 1;
+    const isValid = await trigger(`hashtag.${lastIndex}`);
+    if (hashtagFields.length >= 3) {
+      toast.warning("最多只能新增 3 個標籤");
+      return;
+    }
+    if (isValid) {
+      hashtagAppend("");
+    } else {
+      toast.warning("請先填寫前 1 個標籤");
     }
   };
 
@@ -141,8 +162,6 @@ function ProductEditPage() {
     const images = subImages
       .map(item => (typeof item === "string" ? item : item.image))
       .filter(Boolean);
-
-    const hashtags = [data.hashtag1, data.hashtag2, data.hashtag3].filter(Boolean);
 
     const payload = {
       name: data.name,
@@ -159,15 +178,14 @@ function ProductEditPage() {
       selling_price: Number(data.selling_price),
       primary_image: imageUrl,
       images,
-      hashtags,
+      hashtags: data.hashtag.map(tag => (tag.startsWith("#") ? tag : `#${tag}`)),
     };
 
     try {
       await updateProduct({ productId, updatedProduct: payload }).unwrap();
       toast.success("商品修改成功");
       navigate("/products");
-    } catch (err) {
-      console.error("修改失敗", err);
+    } catch {
       toast.error("商品修改失敗");
     }
   };
@@ -207,15 +225,15 @@ function ProductEditPage() {
                 {/* 圖片上傳 post upload */}
                 <div className="d-flex flex-column flex-lg-row gap-10 gap-lg-0 justify-content-around">
                   {/* 主圖 primary_image */}
-                  <div className="d-flex flex-column align-items-center">
-                    <label className="form-label fw-bold text-gray-500">商品主要圖片</label>
+                  <div className="d-flex flex-column align-items-center gap-4">
+                    <label className="form-label fw-bold text-gray-500 m-0">商品主要圖片</label>
                     <div style={{ position: "relative" }}>
                       <label
                         htmlFor="primaryImageInput"
                         style={{ cursor: "pointer", display: "inline-block", textAlign: "center" }}
                       >
                         <img
-                          src={imageUrl || "/uploadImage.png"}
+                          src={imageUrl || `${ADMIN_APP_BASE}uploadImage.png`}
                           alt="點擊上傳"
                           className={errors.primary_image ? "border border-danger" : ""}
                           style={{
@@ -264,11 +282,11 @@ function ProductEditPage() {
                     )}
                   </div>
                   {/* 副圖 images */}
-                  <div className="d-flex flex-column align-items-center">
-                    <label className="form-label fw-bold text-gray-500">
+                  <div className="d-flex flex-column align-items-center gap-4">
+                    <label className="form-label fw-bold text-gray-500 m-0">
                       商品其他圖片（可多選）
                     </label>
-                    <div className="d-flex gap-2 flex-wrap">
+                    <div className="d-flex justify-content-center gap-2 flex-wrap">
                       {subImages.map((item, index) => (
                         <div key={index} style={{ position: "relative" }}>
                           <img
@@ -287,7 +305,7 @@ function ProductEditPage() {
                       {subImages.length < 5 && (
                         <label htmlFor="subImagesInput" style={{ cursor: "pointer" }}>
                           <img
-                            src={"/uploadImage.png"}
+                            src={`${ADMIN_APP_BASE}uploadImage.png`}
                             alt="點擊上傳"
                             style={{
                               width: "100px",
@@ -320,7 +338,7 @@ function ProductEditPage() {
                           formData.append("files", file);
                           try {
                             const res = await uploadImage(formData).unwrap();
-                            uploadedUrls.push(res.data.image_urls[0]);
+                            uploadedUrls.push({ image: res.data.image_urls[0] });
                           } catch (err) {
                             console.error("圖片上傳失敗", err);
                           }
@@ -347,55 +365,65 @@ function ProductEditPage() {
                   {errors.name && <div className="invalid-feedback m-0">{errors.name.message}</div>}
                 </div>
 
-                {/* 商品分類 */}
-                <div className="d-flex flex-column gap-4">
-                  <label className="form-label fw-bold text-gray-500">商品類別</label>
-                  <select
-                    className={`form-select ${errors.category_id ? "is-invalid" : ""}`}
-                    {...register("category_id")}
-                    defaultValue=""
-                  >
-                    <option value="" disabled>
-                      請選擇商品類別
-                    </option>
-                    {categoryList.map(category => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
+                <div className="row gap-10 gap-lg-0">
+                  {/* 商品分類 */}
+                  <div className="d-flex flex-column gap-4 col-lg-6">
+                    <label className="form-label fw-bold text-gray-500 m-0">商品類別</label>
+                    <select
+                      className={`form-select ${errors.category_id ? "is-invalid" : ""}`}
+                      {...register("category_id")}
+                      defaultValue=""
+                    >
+                      <option value="" disabled>
+                        請選擇商品類別
                       </option>
-                    ))}
-                  </select>
-                  {errors.category_id && (
-                    <div className="invalid-feedback">{errors.category_id.message}</div>
-                  )}
-                </div>
+                      {categoryList.map(category => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.category_id && (
+                      <div className="invalid-feedback">{errors.category_id.message}</div>
+                    )}
+                  </div>
 
-                {/* 保存狀況 */}
-                <div className="d-flex flex-column gap-4">
-                  <label className="form-label fw-bold text-gray-500">商品保存狀況</label>
-                  <select
-                    className={`form-select ${errors.condition_id ? "is-invalid" : ""}`}
-                    {...register("condition_id")}
-                  >
-                    <option value="" disabled>
-                      請選擇商品保存狀況
-                    </option>
-                    {conditionsList.map(condition => (
-                      <option key={condition.id} value={condition.id}>
-                        {condition.name}
+                  {/* 保存狀況 */}
+                  <div className="d-flex flex-column gap-4 col-lg-6">
+                    <label className="form-label fw-bold text-gray-500 m-0">商品保存狀況</label>
+                    <select
+                      className={`form-select ${errors.condition_id ? "is-invalid" : ""}`}
+                      {...register("condition_id")}
+                    >
+                      <option value="" disabled>
+                        請選擇商品保存狀況
                       </option>
-                    ))}
-                  </select>
-                  {errors.condition_id && (
-                    <div className="invalid-feedback">{errors.condition_id.message}</div>
-                  )}
+                      {conditionsList.map(condition => (
+                        <option key={condition.id} value={condition.id}>
+                          {condition.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.condition_id && (
+                      <div className="invalid-feedback">{errors.condition_id.message}</div>
+                    )}
+                  </div>
                 </div>
 
                 {/* 商品簡介 summary*/}
                 <div className="d-flex flex-column gap-4">
-                  <label className="form-label m-0 fw-bold text-gray-500">商品簡介</label>
-
-                  {fields.map((field, index) => (
-                    <div key={field.id} className="d-flex flex-column gap-1">
+                  <div className="d-flex align-items-center gap-2">
+                    <label className="form-label m-0 fw-bold text-gray-500">商品簡介</label>
+                    <button
+                      type="button"
+                      className="btn btn-custom-primary small border-0 rounded-2 px-3 py-1 shadow-none"
+                      onClick={handleAddSummaryLine}
+                    >
+                      + 新增一行簡介
+                    </button>
+                  </div>
+                  {summaryFields.map((field, index) => (
+                    <div key={field.id} className="d-flex flex-column gap-4">
                       <div className="d-flex gap-4 align-items-center">
                         <input
                           type="text"
@@ -407,7 +435,13 @@ function ProductEditPage() {
                           type="button"
                           className="btn btn-outline-danger btn-sm rounded-2"
                           style={{ minWidth: "50px" }}
-                          onClick={() => remove(index)}
+                          onClick={() => {
+                            if (summaryFields.length === 1) {
+                              toast.error("請至少填寫 1 項商品簡介");
+                              return;
+                            }
+                            summaryRemove(index);
+                          }}
                         >
                           移除
                         </button>
@@ -419,47 +453,41 @@ function ProductEditPage() {
                       )}
                     </div>
                   ))}
-
-                  <button
-                    type="button"
-                    className="btn btn-custom-primary w-fit rounded-2 py-2 border-0 shadow-none"
-                    onClick={handleAddSummaryLine}
-                  >
-                    + 新增一行簡介
-                  </button>
                 </div>
 
-                {/* 商品描述標題 title*/}
-                <div className="d-flex flex-column gap-4">
-                  <label className="form-label m-0 fw-bold text-gray-500">商品描述標題</label>
-                  <input
-                    type="text"
-                    className={`form-control ${errors.title ? "is-invalid" : ""}`}
-                    placeholder="請輸入商品描述標題"
-                    {...register("title")}
-                  />
-                  {errors.title && (
-                    <div className="invalid-feedback m-0">{errors.title.message}</div>
-                  )}
-                </div>
+                <div className="row gap-10 gap-lg-0">
+                  {/* 商品描述標題 title*/}
+                  <div className="d-flex flex-column gap-4 col-lg-6">
+                    <label className="form-label m-0 fw-bold text-gray-500">商品描述標題</label>
+                    <input
+                      type="text"
+                      className={`form-control ${errors.title ? "is-invalid" : ""}`}
+                      placeholder="請輸入商品描述標題"
+                      {...register("title")}
+                    />
+                    {errors.title && (
+                      <div className="invalid-feedback m-0">{errors.title.message}</div>
+                    )}
+                  </div>
 
-                {/* 商品描述副標題 subtitle */}
-                <div className="d-flex flex-column gap-4">
-                  <label className="form-label m-0 fw-bold text-gray-500">商品描述副標題</label>
-                  <input
-                    type="text"
-                    className={`form-control ${errors.subtitle ? "is-invalid" : ""}`}
-                    placeholder="請輸入商品描述副標題"
-                    {...register("subtitle")}
-                  />
-                  {errors.subtitle && (
-                    <div className="invalid-feedback m-0">{errors.subtitle.message}</div>
-                  )}
+                  {/* 商品描述副標題 subtitle */}
+                  <div className="d-flex flex-column gap-4 col-lg-6">
+                    <label className="form-label m-0 fw-bold text-gray-500">商品描述副標題</label>
+                    <input
+                      type="text"
+                      className={`form-control ${errors.subtitle ? "is-invalid" : ""}`}
+                      placeholder="請輸入商品描述副標題"
+                      {...register("subtitle")}
+                    />
+                    {errors.subtitle && (
+                      <div className="invalid-feedback m-0">{errors.subtitle.message}</div>
+                    )}
+                  </div>
                 </div>
 
                 {/* 商品完整描述 quill */}
                 <div className="d-flex flex-column gap-2">
-                  <label className="form-label fw-bold text-gray-500">商品完整描述</label>
+                  <label className="form-label fw-bold text-gray-500 m-0">商品完整描述</label>
                   <div
                     className={`quill-wrapper border rounded-top-2 ${errors.description ? "border-danger" : "border-secondary"}`}
                   >
@@ -471,78 +499,86 @@ function ProductEditPage() {
 
                   {/* 錯誤訊息 */}
                   {errors.description && (
-                    <div className="text-danger small">{errors.description.message}</div>
-                  )}
-                </div>
-
-                {/* 商品是否供應 is_available */}
-                <div className="d-flex flex-column gap-4">
-                  <label className="form-label m-0 fw-bold text-gray-500">商品是否供應</label>
-                  <div>
-                    <div className="form-check form-check-inline">
-                      <input
-                        className="form-check-input"
-                        type="radio"
-                        id="isAvailableYes"
-                        value="true"
-                        {...register("is_available")}
-                      />
-                      <label className="form-check-label" htmlFor="isAvailableYes">
-                        是
-                      </label>
-                    </div>
-                    <div className="form-check form-check-inline">
-                      <input
-                        className="form-check-input"
-                        type="radio"
-                        id="isAvailableNo"
-                        value="false"
-                        {...register("is_available")}
-                      />
-                      <label className="form-check-label" htmlFor="isAvailableNo">
-                        否
-                      </label>
-                    </div>
-                  </div>
-                  {errors.is_available && (
-                    <div className="invalid-feedback m-0 d-block">
-                      {errors.is_available.message}
+                    <div className="small" style={{ color: "rgb(220, 53, 69)" }}>
+                      {errors.description.message}
                     </div>
                   )}
                 </div>
 
-                {/* 商品是否為精選商品 is_featured */}
-                <div className="d-flex flex-column gap-4">
-                  <label className="form-label m-0 fw-bold text-gray-500">商品是否為精選商品</label>
-                  <div>
-                    <div className="form-check form-check-inline">
-                      <input
-                        className="form-check-input"
-                        type="radio"
-                        id="isFeaturedYes"
-                        value="true"
-                        {...register("is_featured")}
-                      />
-                      <label className="form-check-label" htmlFor="isFeaturedYes">
-                        是
-                      </label>
+                <div className="row">
+                  {/* 商品是否供應 is_available */}
+                  <div className="d-flex flex-column gap-4 col-lg-6">
+                    <label className="form-label m-0 fw-bold text-gray-500">商品是否供應</label>
+                    <div>
+                      <div className="form-check form-check-inline">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          id="isAvailableYes"
+                          value="true"
+                          {...register("is_available")}
+                        />
+                        <label className="form-check-label" htmlFor="isAvailableYes">
+                          是
+                        </label>
+                      </div>
+                      <div className="form-check form-check-inline">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          id="isAvailableNo"
+                          value="false"
+                          {...register("is_available")}
+                        />
+                        <label className="form-check-label" htmlFor="isAvailableNo">
+                          否
+                        </label>
+                      </div>
                     </div>
-                    <div className="form-check form-check-inline">
-                      <input
-                        className="form-check-input"
-                        type="radio"
-                        id="isFeaturedNo"
-                        value="false"
-                        {...register("is_featured")}
-                      />
-                      <label className="form-check-label" htmlFor="isFeaturedNo">
-                        否
-                      </label>
-                    </div>
+                    {errors.is_available && (
+                      <div className="invalid-feedback m-0 d-block">
+                        {errors.is_available.message}
+                      </div>
+                    )}
                   </div>
-                  {errors.is_featured && (
-                    <div className="invalid-feedback m-0 d-block">{errors.is_featured.message}</div>
-                  )}
+
+                  {/* 商品是否為精選商品 is_featured */}
+                  <div className="d-flex flex-column gap-4 col-lg-6">
+                    <label className="form-label m-0 fw-bold text-gray-500">
+                      商品是否為精選商品
+                    </label>
+                    <div>
+                      <div className="form-check form-check-inline">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          id="isFeaturedYes"
+                          value="true"
+                          {...register("is_featured")}
+                        />
+                        <label className="form-check-label" htmlFor="isFeaturedYes">
+                          是
+                        </label>
+                      </div>
+                      <div className="form-check form-check-inline">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          id="isFeaturedNo"
+                          value="false"
+                          {...register("is_featured")}
+                        />
+                        <label className="form-check-label" htmlFor="isFeaturedNo">
+                          否
+                        </label>
+                      </div>
+                    </div>
+                    {errors.is_featured && (
+                      <div className="invalid-feedback m-0 d-block">
+                        {errors.is_featured.message}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* 標題 屬性 */}
@@ -554,7 +590,7 @@ function ProductEditPage() {
                 <div className="d-flex align-items-center gap-10 gap-lg-0 row">
                   {/* 商品品牌 */}
                   <div className="d-flex flex-column gap-4 col-lg-4">
-                    <label className="form-label fw-bold text-gray-500">商品品牌</label>
+                    <label className="form-label fw-bold text-gray-500 m-0">商品品牌</label>
                     <select
                       className={`form-select ${errors.brand_id ? "is-invalid" : ""}`}
                       {...register("brand_id")}
@@ -603,42 +639,49 @@ function ProductEditPage() {
                 </div>
 
                 {/* Hashtags 輸入區塊 */}
-                <div className="d-flex align-items-center gap-10 gap-lg-0 row">
-                  <div className="d-flex flex-column gap-4 col-lg-4">
-                    <label className="form-label m-0 fw-bold text-gray-500">標籤1</label>
-                    <input
-                      type="text"
-                      className={`form-control ${errors.hashtag1 ? "is-invalid" : ""}`}
-                      placeholder="請填寫"
-                      {...register("hashtag1")}
-                    />
-                    {errors.hashtag1 && (
-                      <div className="invalid-feedback m-0">{errors.hashtag1.message}</div>
-                    )}
+                <div className="d-flex flex-column gap-4">
+                  <div className="d-flex align-items-center gap-2">
+                    <label className="form-label m-0 fw-bold text-gray-500">商品標籤</label>
+                    <button
+                      type="button"
+                      className="btn btn-custom-primary small border-0 rounded-2 px-3 py-1 shadow-none"
+                      onClick={handleAddHashtagField}
+                    >
+                      + 新增商品標籤
+                    </button>
                   </div>
-                  <div className="d-flex flex-column gap-4 col-lg-4">
-                    <label className="form-label m-0 fw-bold text-gray-500">標籤2</label>
-                    <input
-                      type="text"
-                      className={`form-control ${errors.hashtag2 ? "is-invalid" : ""}`}
-                      placeholder="請填寫"
-                      {...register("hashtag2")}
-                    />
-                    {errors.hashtag2 && (
-                      <div className="invalid-feedback m-0">{errors.hashtag2.message}</div>
-                    )}
-                  </div>
-                  <div className="d-flex flex-column gap-4 col-lg-4">
-                    <label className="form-label m-0 fw-bold text-gray-500">標籤3</label>
-                    <input
-                      type="text"
-                      className={`form-control ${errors.hashtag3 ? "is-invalid" : ""}`}
-                      placeholder="請填寫"
-                      {...register("hashtag3")}
-                    />
-                    {errors.hashtag3 && (
-                      <div className="invalid-feedback m-0">{errors.hashtag3.message}</div>
-                    )}
+                  <div className="row gap-4 gap-lg-0">
+                    {hashtagFields.map((field, index) => (
+                      <div key={field.id} className="col-lg-4">
+                        <div className="d-flex gap-4 align-items-center">
+                          <input
+                            type="text"
+                            className={`form-control ${errors.hashtag?.[index] ? "is-invalid" : ""}`}
+                            placeholder={`請輸入商品標籤（第 ${index + 1} 個）`}
+                            {...register(`hashtag.${index}`)}
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-outline-danger btn-sm rounded-2 col-1"
+                            style={{ minWidth: "50px" }}
+                            onClick={() => {
+                              if (hashtagFields.length === 1) {
+                                toast.warning("請至少填寫 1 項商品標籤");
+                                return;
+                              }
+                              hashtagRemove(index);
+                            }}
+                          >
+                            移除
+                          </button>
+                        </div>
+                        {errors.hashtag?.[index] && (
+                          <div className="invalid-feedback d-block">
+                            {errors.hashtag[index].message}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
