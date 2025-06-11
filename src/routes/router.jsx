@@ -32,7 +32,7 @@ const ROUTES = {
   COUPONS: {
     LIST: "/coupons",
     CREATE: "/coupons/new",
-    EDIT: "/coupons/:couponId/edit",
+    EDIT: "/coupons/edit/:couponId",
   },
 };
 
