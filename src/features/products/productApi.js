@@ -14,9 +14,20 @@ export const productApi = createApi({
   }),
   tagTypes: ["Product"],
   endpoints: builder => ({
-    // 取得商品列表
+    // 取得商品列表 - 修改為接受參數
     getProducts: builder.query({
-      query: () => "/products",
+      query: (params = {}) => {
+        // 將參數轉換為 URL 查詢字符串
+        const searchParams = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== "") {
+            searchParams.append(key, value.toString());
+          }
+        });
+
+        const queryString = searchParams.toString();
+        return `/products${queryString ? `?${queryString}` : ""}`;
+      },
       providesTags: result =>
         result?.data
           ? [
@@ -46,16 +57,25 @@ export const productApi = createApi({
         method: "PUT",
         body: updatedProduct,
       }),
-      invalidatesTags: (result, error, { productId }) => [{ type: "Product", id: productId }],
+      invalidatesTags: (result, error, { productId }) => [
+        { type: "Product", id: productId },
+        { type: "Product", id: "LIST" },
+      ],
     }),
     // 下架商品
     deactivateProduct: builder.mutation({
-      query: ({ productId, statusUpdate }) => ({
-        url: `/products/${productId}`,
-        method: "PATCH",
-        body: statusUpdate,
+      query: ({ productId, available = false }) => ({
+        url: "/products/pull",
+        method: "POST", // or PATCH
+        body: {
+          id: productId,
+          available: available,
+        },
       }),
-      invalidatesTags: (result, error, { productId }) => [{ type: "Product", id: productId }],
+      invalidatesTags: (result, error, { productId }) => [
+        { type: "Product", id: productId },
+        { type: "Product", id: "LIST" },
+      ],
     }),
     // 刪除商品
     deleteProductById: builder.mutation({
