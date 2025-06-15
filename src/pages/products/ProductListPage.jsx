@@ -6,6 +6,7 @@ import {
   useDeleteProductByIdMutation,
   useDeactivateProductMutation,
 } from "@/features/products/productApi";
+import { useGetProductCategoryQuery } from "@/features/products/productAttributesApi";
 
 function ProductListPage() {
   const navigate = useNavigate();
@@ -15,6 +16,10 @@ function ProductListPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  // 獲取商品類別資料
+  const { data: categoriesData, isLoading: categoriesLoading } = useGetProductCategoryQuery();
+  const categories = categoriesData?.data || categoriesData || [];
 
   const queryParams = useMemo(() => {
     const params = {
@@ -29,8 +34,8 @@ function ProductListPage() {
     // 搜尋關鍵字
     if (searchKeyword.trim()) params.keyword = searchKeyword.trim();
 
-    // 類別篩選
-    if (categoryFilter) params.category = categoryFilter;
+    // 類別篩選 - 使用 category_id
+    if (categoryFilter) params.category_id = categoryFilter;
 
     // 狀態篩選
     if (statusFilter === "published") params.is_available = true;
@@ -46,7 +51,7 @@ function ProductListPage() {
 
   const products = productsData?.data || [];
   const totalPages = productsData?.total_pages || 0;
-  const totalProducts = products.length;
+  const totalProducts = productsData?.total_count || 0;
 
   useEffect(() => {
     if (error) {
@@ -57,6 +62,17 @@ function ProductListPage() {
 
   const handleSearch = () => {
     setCurrentPage(1); // 搜尋後重置頁數
+  };
+
+  // 下架商品
+  const handleDeactivateProduct = async productId => {
+    try {
+      await deactivateProduct({ productId, available: false }).unwrap();
+      alert("商品已成功下架！");
+    } catch (error) {
+      console.error("下架失敗", error);
+      alert("下架失敗，請稍後再試。");
+    }
   };
 
   // 重新上架商品
@@ -116,6 +132,14 @@ function ProductListPage() {
 
   const handlePageSizeChange = newPageSize => {
     setPageSize(newPageSize);
+    setCurrentPage(1);
+  };
+
+  // 重置篩選條件
+  const handleResetFilters = () => {
+    setSearchKeyword("");
+    setCategoryFilter("");
+    setStatusFilter("");
     setCurrentPage(1);
   };
 
@@ -213,12 +237,17 @@ function ProductListPage() {
                 className="form-select"
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
+                disabled={categoriesLoading}
               >
                 <option value="">請選擇商品分類</option>
-                <option value="鏡頭">鏡頭</option>
-                <option value="機身">機身</option>
-                <option value="配件">配件</option>
-                <option value="相機">相機</option>
+                {categories.map(category => (
+                  <option
+                    key={category.category_id || category.id}
+                    value={category.category_id || category.id}
+                  >
+                    {category.name || category.category_name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="col-md-3">
@@ -234,16 +263,45 @@ function ProductListPage() {
                 <option value="out_of_stock">已售出</option>
               </select>
             </div>
+            <div className="col-md-3 d-flex align-items-end gap-2">
+              {/* <button className="btn btn-primary flex-fill" onClick={handleSearch}>
+                搜尋
+              </button> */}
+              {/* <button className="btn btn-outline-secondary" onClick={handleResetFilters}>
+                重置
+              </button> */}
+            </div>
           </div>
         </div>
 
         {/* 商品數量顯示 */}
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <span className="text-muted small">
-            共 {totalProducts} 件商品
-            {totalPages > 0 && ` | 第 ${currentPage} 頁，共 ${totalPages} 頁`}
-          </span>
-          {isLoading && <span className="text-muted small">載入中...</span>}
+        <div className="d-flex justify-content-start align-items-center mb-2">
+          <div className="d-flex gap-2 align-items-center">
+            {searchKeyword || categoryFilter || statusFilter ? (
+              <span className="text-muted p-1">篩選結果：</span>
+            ) : null}
+
+            <span className="text-muted small px-0">
+              共 <span className="text-dark">{totalProducts}</span> 件商品
+            </span>
+
+            {totalPages > 0 && (
+              <>
+                <span className="text-muted">|</span>
+                <span className="text-muted small">
+                  第 <span className="text-dark">{currentPage}</span> /
+                  <span className="text-dark"> {totalPages}</span> 頁
+                </span>
+
+                {products.length < totalProducts && (
+                  <>
+                    <span className="text-muted">|</span>
+                    <span className="text-muted small">本頁 {products.length} 件</span>
+                  </>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         {/* 商品列表表格 */}
@@ -259,7 +317,7 @@ function ProductListPage() {
           {isLoading ? (
             <div className="text-center py-5">載入中...</div>
           ) : products.length === 0 ? (
-            <div className="text-center py-5 text-muted">沒有找到商品</div>
+            <div className="text-center py-5 text-muted">查無商品</div>
           ) : (
             products.map(product => {
               const status = getProductStatus(product);
@@ -300,26 +358,28 @@ function ProductListPage() {
                         </button>
                       )}
 
-                      {/* 修改按鈕 - 改為 Link 元件 */}
+                      {/* 修改按鈕 */}
                       <Link
-                        to={`/products/edit/${product.id}`}
+                        to={`/products/${product.id}/edit`}
                         className="btn btn-link btn-sm text-primary p-0 text-decoration-none"
                         title="修改商品資訊"
                       >
                         修改
                       </Link>
 
-                      {/* 下架按鈕 - 只有上架且未售出的商品才顯示 */}
+                      {/* 下架按鈕 - 只有上架+未售出的商品才顯示 */}
                       {product.available && !product.sold && (
                         <button
                           className="btn btn-link btn-sm text-warning p-0 text-decoration-none"
+                          onClick={() => handleDeactivateProduct(product.id)}
                           title="下架商品"
+                          disabled={isLoading}
                         >
-                          下架
+                          {isLoading ? "下架中..." : "下架"}
                         </button>
                       )}
 
-                      {/* 刪除按鈕 - 所有商品都可以刪除 (軟刪除) */}
+                      {/* 刪除按鈕 */}
                       <button
                         className="btn btn-link btn-sm text-danger p-0 text-decoration-none"
                         onClick={() => handleDeleteProduct(product.id)}

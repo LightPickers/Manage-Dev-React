@@ -65,8 +65,8 @@ export const productApi = createApi({
     // 下架商品
     deactivateProduct: builder.mutation({
       query: ({ productId, available = false }) => ({
-        url: "/products/pull",
-        method: "POST", // or PATCH
+        url: "/products/pulled",
+        method: "PATCH",
         body: {
           id: productId,
           available: available,
