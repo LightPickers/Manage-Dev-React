@@ -199,19 +199,12 @@ function ProductListPage() {
         {/* 標題與新增按鈕 */}
         <div className="d-flex justify-content-between align-items-center mt-3">
           <h2>我的商品</h2>
-          <div className="d-flex justify-content-end gap-5">
-            <button
-              type="button"
-              className="btn btn-custom-primary small"
-              onClick={() => navigate("/products")}
-            >
-              取消
-            </button>
-            <button type="submit" className="btn btn-custom-primary small">
-              Test
-            </button>
-          </div>
-          <button className="btn btn-dark px-4 py-2" onClick={() => navigate("/products/new")}>
+
+          <button
+            type="button"
+            className="btn btn-custom-primary small "
+            onClick={() => navigate("/products/new")}
+          >
             ＋新增商品
           </button>
         </div>
@@ -226,9 +219,10 @@ function ProductListPage() {
           ].map(tab => (
             <button
               key={tab.key}
-              className={`btn px-3 py-1 border ${
+              className={`btn px-3 py-1 border  ${
                 activeTab === tab.key ? "bg-white border-dark" : "bg-light"
               }`}
+              style={{ boxShadow: "none" }}
               onClick={() => handleTabClick(tab.key)}
             >
               {tab.label}
@@ -329,8 +323,8 @@ function ProductListPage() {
             <div className="col-6 text-start ps-10">商品</div>
             <div className="col-1 text-center">已出售</div>
             <div className="col-2 text-center">售價</div>
-            <div className="col-2 text-center">商品狀態</div>
-            <div className="col-1 text-center">操作</div>
+            <div className="col-1 text-center">商品狀態</div>
+            <div className="col-2 text-center">操作</div>
           </div>
 
           {isLoading ? (
@@ -361,15 +355,17 @@ function ProductListPage() {
                   <div className="col-2 text-center fw-semibold">
                     {formatPrice(product.selling_price)}
                   </div>
-                  <div className="col-2 text-center">
+                  <div className="col-1 text-center">
                     <span className={`fw-semibold ${status.color}`}>{status.text}</span>
                   </div>
-                  <div className="col-1 text-center">
-                    <div className="d-flex flex-column gap-1">
-                      {/* 重新上架按鈕 - 下架且未售出的商品才顯示 */}
+                  <div className="col-2 text-center">
+                    <div className="d-flex flex-column gap-1 align-items-center">
+                      {/* 重新上架按鈕 下架且未售出的商品才顯示 */}
                       {!product.available && !product.sold && (
                         <button
-                          className="btn btn-link btn-sm p-0 text-decoration-none"
+                          type="button"
+                          className="btn btn-custom-primary small px-5 py-1 "
+                          style={{ fontSize: "0.8rem" }}
                           onClick={() => handleRelistProduct(product.id)}
                           title="重新上架商品"
                         >
@@ -380,7 +376,9 @@ function ProductListPage() {
                       {/* 下架按鈕 - 只有上架+未售出的商品才顯示 */}
                       {product.available && !product.sold && (
                         <button
-                          className="btn btn-link btn-sm text-warning p-0 text-decoration-none"
+                          type="button"
+                          className="btn btn-custom-primary small px-5 py-1"
+                          style={{ fontSize: "0.8rem" }}
                           onClick={() => handleDeactivateProduct(product.id)}
                           title="下架商品"
                           disabled={isLoading}
@@ -392,7 +390,8 @@ function ProductListPage() {
                       {/* 修改按鈕 */}
                       <Link
                         to={`/products/${product.id}/edit`}
-                        className="btn btn-link btn-sm text-primary p-0 text-decoration-none"
+                        className="btn btn-custom-primary small px-5 py-1"
+                        style={{ fontSize: "0.8rem" }}
                         title="修改商品資訊"
                       >
                         修改
@@ -400,7 +399,9 @@ function ProductListPage() {
 
                       {/* 刪除按鈕 */}
                       <button
-                        className="btn btn-link btn-sm text-danger p-0 text-decoration-none"
+                        type="button"
+                        className="btn btn-custom-primary small px-5 py-1 "
+                        style={{ fontSize: "0.8rem" }}
                         onClick={() => handleDeleteProduct(product.id)}
                         title="刪除商品"
                       >
