@@ -182,107 +182,122 @@ function ProductListPage() {
   };
 
   return (
-    <div className="bg-light min-vh-100">
-      <div className="container py-4 py-lg-5">
+    <div className="container ">
+      <div className="d-flex flex-column gap-10 py-10 py-lg-20">
         {/* Breadcrumb */}
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0">
             <li className="breadcrumb-item">
-              <Link to="/dashboard">首頁</Link>
+              <Link className="text-gray-" to="/dashboard">
+                首頁
+              </Link>
             </li>
-            <li className="breadcrumb-item">
-              <Link to="/products">商品列表</Link>
-            </li>
+            <li className="breadcrumb-item active">商品列表</li>
           </ol>
         </nav>
 
         {/* 標題與新增按鈕 */}
-        <div className="d-flex justify-content-between align-items-center mt-3">
-          <h2>我的商品</h2>
-
+        <div className="d-flex justify-content-between align-items-center">
+          <h2>商品列表</h2>
           <button
             type="button"
-            className="btn btn-custom-primary small "
+            className="btn text-white px-4 rounded-pill "
             onClick={() => navigate("/products/new")}
+            style={{
+              backgroundColor: "#8BB0B7",
+              borderColor: "#8BB0B7",
+            }}
+            onMouseEnter={e => {
+              e.target.style.backgroundColor = "#7A9FA6";
+              e.target.style.borderColor = "#7A9FA6";
+            }}
+            onMouseLeave={e => {
+              e.target.style.backgroundColor = "#8BB0B7";
+              e.target.style.borderColor = "#8BB0B7";
+            }}
           >
             ＋新增商品
           </button>
         </div>
-        <hr />
 
         {/* 上方篩選 tabs */}
-        <div className="d-flex gap-2 mb-3">
-          {[
-            { key: "all", label: "全部商品" },
-            { key: "published", label: "已上架商品" },
-            { key: "unpublished", label: "未上架商品" },
-          ].map(tab => (
-            <button
-              key={tab.key}
-              className={`btn px-3 py-1 border  ${
-                activeTab === tab.key ? "bg-white border-dark" : "bg-light"
-              }`}
-              style={{ boxShadow: "none" }}
-              onClick={() => handleTabClick(tab.key)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* 搜尋與篩選 */}
-        <div className="bg-white p-3 rounded mb-4">
-          <div className="row gy-3 d-flex justify-content-between align-items-center mb-2">
-            <div className="col-md-3">
-              <label className="form-label small text-muted">搜尋商品</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="請輸入商品名稱或編號"
-                value={searchKeyword}
-                onChange={e => setSearchKeyword(e.target.value)}
-                onKeyPress={e => e.key === "Enter" && handleSearch()}
-              />
+        <div className="bg-white rounded">
+          <div className="p-3 border-bottom">
+            <div className="d-flex gap-2 mb-3">
+              {[
+                { key: "all", label: "全部商品" },
+                { key: "published", label: "已上架商品" },
+                { key: "unpublished", label: "未上架商品" },
+              ].map(tab => (
+                <button
+                  key={tab.key}
+                  className={`btn ${activeTab === tab.key ? "" : "btn-outline-secondary"}`}
+                  onClick={() => handleTabClick(tab.key)}
+                  style={{
+                    backgroundColor: activeTab === tab.key ? "#8BB0B7" : "transparent",
+                    borderColor: activeTab === tab.key ? "#8BB0B7" : "#6c757d",
+                    color: activeTab === tab.key ? "white" : "#6c757d",
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
-            <div className="col-md-3">
-              <label className="form-label small text-muted">商品類別</label>
-              <select
-                className="form-select"
-                value={categoryFilter}
-                onChange={e => setCategoryFilter(e.target.value)}
-                disabled={categoriesLoading}
-              >
-                <option value="">全部</option>
-                {categories.map(category => (
-                  <option
-                    key={category.category_id || category.id}
-                    value={category.category_id || category.id}
-                  >
-                    {category.name || category.category_name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="col-md-3">
-              <label className="form-label small text-muted">商品狀態</label>
-              <select
-                className="form-select"
-                value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
-              >
-                <option value="">全部狀態</option>
-                <option value="published">銷售中</option>
-                <option value="draft">下架中</option>
-                <option value="out_of_stock">已售出</option>
-              </select>
-            </div>
-            <div className="col-md-3 d-flex align-items-end gap-2">
-              {/* <button className="btn btn-primary flex-fill" onClick={handleSearch}>
+          </div>
+          <div className="p-3">
+            {/* 搜尋與篩選 */}
+            <div className="row gy-3 d-flex justify-content-between align-items-center mb-2">
+              <div className="col-md-3">
+                <label className="form-label small text-muted">搜尋商品</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="請輸入商品名稱或編號"
+                  value={searchKeyword}
+                  onChange={e => setSearchKeyword(e.target.value)}
+                  onKeyPress={e => e.key === "Enter" && handleSearch()}
+                />
+              </div>
+              <div className="col-md-3">
+                <label className="form-label small text-muted">商品類別</label>
+                <select
+                  className="form-select"
+                  value={categoryFilter}
+                  onChange={e => setCategoryFilter(e.target.value)}
+                  disabled={categoriesLoading}
+                >
+                  <option value="">全部</option>
+                  {categories.map(category => (
+                    <option
+                      key={category.category_id || category.id}
+                      value={category.category_id || category.id}
+                    >
+                      {category.name || category.category_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-md-3">
+                <label className="form-label small text-muted">商品狀態</label>
+                <select
+                  className="form-select"
+                  value={statusFilter}
+                  onChange={e => setStatusFilter(e.target.value)}
+                >
+                  <option value="">全部狀態</option>
+                  <option value="published">銷售中</option>
+                  <option value="draft">下架中</option>
+                  <option value="out_of_stock">已售出</option>
+                </select>
+              </div>
+              <div className="col-md-3 d-flex align-items-end gap-2">
+                {/* <button className="btn btn-primary flex-fill" onClick={handleSearch}>
                 搜尋
               </button> */}
-              {/* <button className="btn btn-outline-secondary" onClick={handleResetFilters}>
+                {/* <button className="btn btn-outline-secondary" onClick={handleResetFilters}>
                 重置
               </button> */}
+              </div>
             </div>
           </div>
         </div>
