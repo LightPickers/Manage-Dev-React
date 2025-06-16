@@ -51,7 +51,7 @@ function ProductListPage() {
 
   const products = productsData?.data || [];
   const totalPages = productsData?.total_pages || 0;
-  const totalProducts = productsData?.total_count || 0;
+  const totalProducts = productsData?.total_product || 0;
 
   useEffect(() => {
     if (error) {
@@ -64,7 +64,7 @@ function ProductListPage() {
     setCurrentPage(1); // 搜尋後重置頁數
   };
 
-  // 下架商品
+  // 下架商品 待後端確認是否需要帶available值
   const handleDeactivateProduct = async productId => {
     try {
       await deactivateProduct({ productId, available: false }).unwrap();
@@ -75,7 +75,7 @@ function ProductListPage() {
     }
   };
 
-  // 重新上架商品
+  // 重新上架商品 待後端確認是否需要帶available值
   const handleRelistProduct = async productId => {
     try {
       const result = await deactivateProduct({
