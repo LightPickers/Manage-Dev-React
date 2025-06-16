@@ -4,9 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 
 import {
   useGetProductsQuery,
-  useDeleteProductByIdMutation,
   useDeactivateProductMutation,
   useRelistProductMutation,
+  useDeleteProductByIdMutation,
 } from "@/features/products/productApi";
 import { useGetProductCategoryQuery } from "@/features/products/productAttributesApi";
 
@@ -70,11 +70,16 @@ function ProductListPage() {
   // 下架商品 後端已確認不需帶available值
   const handleDeactivateProduct = async productId => {
     try {
-      await deactivateProduct({ productId }).unwrap();
-      alert("商品已成功下架！");
+      const result = await deactivateProduct({ productId }).unwrap();
+
+      if (result.status === "true" || result.status === true) {
+        toast.success("商品已成功下架！");
+      } else {
+        toast.error("商品下架失敗");
+      }
     } catch (error) {
-      console.error("下架失敗", error);
-      alert("下架失敗，請稍後再試。");
+      console.error("商品下架錯誤:", error);
+      toast.error(`商品下架失敗: ${error?.data?.message || error.message}`);
     }
   };
 
@@ -86,9 +91,9 @@ function ProductListPage() {
       }).unwrap();
 
       if (result.status === "true" || result.status === true) {
-        toast.success("商品重新上架成功");
+        toast.success("商品已重新上架成功！");
       } else {
-        toast.error("重新上架失敗");
+        toast.error("商品重新上架失敗");
       }
     } catch (error) {
       console.error("重新上架錯誤:", error);
@@ -194,6 +199,18 @@ function ProductListPage() {
         {/* 標題與新增按鈕 */}
         <div className="d-flex justify-content-between align-items-center mt-3">
           <h2>我的商品</h2>
+          <div className="d-flex justify-content-end gap-5">
+            <button
+              type="button"
+              className="btn btn-custom-primary small"
+              onClick={() => navigate("/products")}
+            >
+              取消
+            </button>
+            <button type="submit" className="btn btn-custom-primary small">
+              Test
+            </button>
+          </div>
           <button className="btn btn-dark px-4 py-2" onClick={() => navigate("/products/new")}>
             ＋新增商品
           </button>
@@ -241,7 +258,7 @@ function ProductListPage() {
                 onChange={e => setCategoryFilter(e.target.value)}
                 disabled={categoriesLoading}
               >
-                <option value="">請選擇商品分類</option>
+                <option value="">全部</option>
                 {categories.map(category => (
                   <option
                     key={category.category_id || category.id}
@@ -253,7 +270,7 @@ function ProductListPage() {
               </select>
             </div>
             <div className="col-md-3">
-              <label className="form-label small text-muted">狀態篩選</label>
+              <label className="form-label small text-muted">商品狀態</label>
               <select
                 className="form-select"
                 value={statusFilter}
@@ -360,15 +377,6 @@ function ProductListPage() {
                         </button>
                       )}
 
-                      {/* 修改按鈕 */}
-                      <Link
-                        to={`/products/${product.id}/edit`}
-                        className="btn btn-link btn-sm text-primary p-0 text-decoration-none"
-                        title="修改商品資訊"
-                      >
-                        修改
-                      </Link>
-
                       {/* 下架按鈕 - 只有上架+未售出的商品才顯示 */}
                       {product.available && !product.sold && (
                         <button
@@ -380,6 +388,15 @@ function ProductListPage() {
                           {isLoading ? "下架中..." : "下架"}
                         </button>
                       )}
+
+                      {/* 修改按鈕 */}
+                      <Link
+                        to={`/products/${product.id}/edit`}
+                        className="btn btn-link btn-sm text-primary p-0 text-decoration-none"
+                        title="修改商品資訊"
+                      >
+                        修改
+                      </Link>
 
                       {/* 刪除按鈕 */}
                       <button
