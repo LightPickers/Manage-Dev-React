@@ -64,12 +64,11 @@ export const productApi = createApi({
     }),
     // 下架商品
     deactivateProduct: builder.mutation({
-      query: ({ productId, available = false }) => ({
-        url: "/products/pull",
-        method: "POST", // or PATCH
+      query: ({ productId }) => ({
+        url: "/products/pulled",
+        method: "PATCH",
         body: {
           id: productId,
-          available: available,
         },
       }),
       invalidatesTags: (result, error, { productId }) => [
@@ -77,6 +76,21 @@ export const productApi = createApi({
         { type: "Product", id: "LIST" },
       ],
     }),
+    //重新上架商品
+    relistProduct: builder.mutation({
+      query: ({ productId }) => ({
+        url: "/products/shelved",
+        method: "PATCH",
+        body: {
+          id: productId,
+        },
+      }),
+      invalidatesTags: (result, error, { productId }) => [
+        { type: "Product", id: productId },
+        { type: "Product", id: "LIST" },
+      ],
+    }),
+
     // 刪除商品
     deleteProductById: builder.mutation({
       query: productId => ({
@@ -97,6 +111,7 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeactivateProductMutation,
+  useRelistProductMutation,
   useDeleteProductByIdMutation,
   usePrefetch,
 } = productApi;
