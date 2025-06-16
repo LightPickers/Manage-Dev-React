@@ -13,10 +13,11 @@ function UserListPage() {
     page: currentPage,
     keyword: debouncedKeyword,
   });
+
   const [toggleUserActiveStatus] = useToggleUserActiveStatusMutation();
   const [updatingId, setUpdatingId] = useState(null);
   const users = data?.data?.users || [];
-  const usersNumber = data?.data?.users.length;
+  const usersNumber = data?.data?.totalUsers || 0;
   const totalPages = data?.data?.totalPages || 1;
   if (isLoading) {
     return <div className="container text-center py-20">載入中...</div>;
@@ -229,7 +230,7 @@ function UserListPage() {
               <ul className="pagination justify-content-center mb-0">
                 <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
-                    className="page-link"
+                    className="page-link shadow-none"
                     onClick={() => currentPage > 1 && setPage(currentPage - 1)}
                   >
                     &lt;
@@ -241,7 +242,7 @@ function UserListPage() {
                     key={index}
                     className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
                   >
-                    <button className="page-link" onClick={() => setPage(index + 1)}>
+                    <button className="page-link shadow-none" onClick={() => setPage(index + 1)}>
                       {index + 1}
                     </button>
                   </li>
@@ -249,7 +250,7 @@ function UserListPage() {
 
                 <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                   <button
-                    className="page-link"
+                    className="page-link shadow-none"
                     onClick={() => currentPage < totalPages && setPage(currentPage + 1)}
                   >
                     &gt;
