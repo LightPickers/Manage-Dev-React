@@ -1,10 +1,12 @@
 import { toast } from "react-toastify";
 import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import {
   useGetProductsQuery,
   useDeleteProductByIdMutation,
   useDeactivateProductMutation,
+  useRelistProductMutation,
 } from "@/features/products/productApi";
 import { useGetProductCategoryQuery } from "@/features/products/productAttributesApi";
 
@@ -48,6 +50,7 @@ function ProductListPage() {
   const { data: productsData, error, isLoading } = useGetProductsQuery(queryParams);
   const [deleteProduct] = useDeleteProductByIdMutation();
   const [deactivateProduct] = useDeactivateProductMutation();
+  const [relistProduct] = useRelistProductMutation();
 
   const products = productsData?.data || [];
   const totalPages = productsData?.total_pages || 0;
@@ -64,10 +67,10 @@ function ProductListPage() {
     setCurrentPage(1); // 搜尋後重置頁數
   };
 
-  // 下架商品 待後端確認是否需要帶available值
+  // 下架商品 後端已確認不需帶available值
   const handleDeactivateProduct = async productId => {
     try {
-      await deactivateProduct({ productId, available: false }).unwrap();
+      await deactivateProduct({ productId }).unwrap();
       alert("商品已成功下架！");
     } catch (error) {
       console.error("下架失敗", error);
@@ -75,12 +78,11 @@ function ProductListPage() {
     }
   };
 
-  // 重新上架商品 待後端確認是否需要帶available值
+  // 重新上架商品 後端已確認不需帶available值
   const handleRelistProduct = async productId => {
     try {
-      const result = await deactivateProduct({
+      const result = await relistProduct({
         productId,
-        available: true, // 設為true來重新上架
       }).unwrap();
 
       if (result.status === "true" || result.status === true) {
@@ -136,12 +138,12 @@ function ProductListPage() {
   };
 
   // 重置篩選條件
-  const handleResetFilters = () => {
-    setSearchKeyword("");
-    setCategoryFilter("");
-    setStatusFilter("");
-    setCurrentPage(1);
-  };
+  // const handleResetFilters = () => {
+  //   setSearchKeyword("");
+  //   setCategoryFilter("");
+  //   setStatusFilter("");
+  //   setCurrentPage(1);
+  // };
 
   // 計算分頁顯示邏輯
   const getPaginationRange = () => {
@@ -347,10 +349,10 @@ function ProductListPage() {
                   </div>
                   <div className="col-1 text-center">
                     <div className="d-flex flex-column gap-1">
-                      {/* 重新上架按鈕 - 只有下架且未售出的商品才顯示 */}
+                      {/* 重新上架按鈕 - 下架且未售出的商品才顯示 */}
                       {!product.available && !product.sold && (
                         <button
-                          className="btn btn-link btn-sm text-success p-0 text-decoration-none"
+                          className="btn btn-link btn-sm p-0 text-decoration-none"
                           onClick={() => handleRelistProduct(product.id)}
                           title="重新上架商品"
                         >
