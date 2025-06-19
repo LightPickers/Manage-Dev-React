@@ -23,7 +23,7 @@ function OrderDetailsPage() {
               <Link to="/orders">訂單管理</Link>
             </li>
             <li className="breadcrumb-item active">
-              訂單編號：{`${orderByIdData?.order?.merchant_order_no}`}
+              訂單編號：{orderByIdData?.order?.merchant_order_no || "未產生"}
             </li>
           </ol>
         </nav>
@@ -37,7 +37,9 @@ function OrderDetailsPage() {
                     <h4 className="mb-5 mb-md-0">訂單資訊</h4>
                   </div>
                   <div className="col-md-9">
-                    <p className="mb-2">訂單編號：{orderByIdData.order.merchant_order_no}</p>
+                    <p className="mb-2">
+                      訂單編號：{orderByIdData?.order?.merchant_order_no || "未產生"}
+                    </p>
                     <p className="mb-2">
                       建立日期：{new Date(orderByIdData.order.created_at).toLocaleString("zh-TW")}
                     </p>
