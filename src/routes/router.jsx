@@ -14,6 +14,7 @@ import {
   CouponListPage,
   UserListPage,
   OrderListPage,
+  OrderDetailsPage,
   ErrorPage,
 } from "@pages";
 import LightPickersAdminApp from "@/LightPickersAdminApp";
@@ -23,7 +24,10 @@ const ROUTES = {
   DASHBOARD: "/dashboard",
   LOGIN: "login",
   USER: "/users",
-  ORDER: "/orders",
+  ORDER: {
+    LIST: "/orders",
+    DETAILS: "/orders/:orderId",
+  },
   PRODUCTS: {
     LIST: "/products",
     CREATE: "/products/new",
@@ -68,14 +72,22 @@ const couponRoutes = [
   },
 ];
 
+// 訂單管理
+const orderRoutes = [
+  {
+    path: ROUTES.ORDER.LIST,
+    element: <OrderListPage />,
+  },
+  {
+    path: ROUTES.ORDER.DETAILS,
+    element: <OrderDetailsPage />,
+  },
+];
+
 const otherRoutes = [
   {
     path: ROUTES.DASHBOARD,
     element: <DashboardPage />,
-  },
-  {
-    path: ROUTES.ORDER,
-    element: <OrderListPage />,
   },
   {
     path: ROUTES.USER,
@@ -83,7 +95,7 @@ const otherRoutes = [
   },
 ];
 
-const adminPages = [...productRoutes, ...couponRoutes, ...otherRoutes];
+const adminPages = [...productRoutes, ...couponRoutes, ...orderRoutes, ...otherRoutes];
 const adminRoutes = [
   {
     path: "login",
