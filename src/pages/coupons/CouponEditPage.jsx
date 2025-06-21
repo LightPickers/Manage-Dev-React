@@ -26,7 +26,7 @@ function CouponEditPage() {
       discount: "",
       quantity: "",
       code: "",
-      distributedQuantity: "1",
+      distributedQuantity: "",
       start_at: "",
       end_at: "",
     },
@@ -301,54 +301,7 @@ function CouponEditPage() {
 
                   {/* 每個買家最大配額 */}
                   <div className="row g-3 mt-3">
-                    <div className="col-md-3">
-                      <label className="form-label">每個買家最大配額</label>
-                      <div className="d-flex align-items-center">
-                        <button
-                          type="button"
-                          className="btn btn-outline-secondary d-flex align-items-center justify-content-center"
-                          style={{ width: "40px", height: "40px" }}
-                          onClick={() => handleQuantityChange(-1)}
-                        >
-                          −
-                        </button>
-                        <input
-                          type="number"
-                          className={`form-control mx-2 text-center ${errors.distributedQuantity ? "is-invalid" : ""}`}
-                          placeholder="請輸入數字"
-                          min="1"
-                          step="1"
-                          onWheel={e => e.target.blur()}
-                          onInput={e => {
-                            e.target.value = e.target.value.replace(/[^0-9]/g, "");
-                          }}
-                          {...register("distributedQuantity", {
-                            required: "請輸入每個買家最大配額",
-                            min: {
-                              value: 1,
-                              message: "配額不能小於1",
-                            },
-                            pattern: {
-                              value: /^[1-9]\d*$/,
-                              message: "配額必須為正整數",
-                            },
-                          })}
-                        />
-                        <button
-                          type="button"
-                          className="btn btn-outline-secondary d-flex align-items-center justify-content-center"
-                          style={{ width: "40px", height: "40px" }}
-                          onClick={() => handleQuantityChange(1)}
-                        >
-                          +
-                        </button>
-                      </div>
-                      {errors.distributedQuantity && (
-                        <div className="invalid-feedback d-block">
-                          {errors.distributedQuantity.message}
-                        </div>
-                      )}
-                    </div>
+                    <label className="form-label">每個買家最大配額 : 1</label>
                   </div>
                 </div>
 
@@ -402,7 +355,7 @@ function CouponEditPage() {
                     className={`btn coupon-btn-submit px-4 rounded-pill ${!isDataChanged && !isLoading ? "disabled" : ""}`}
                     disabled={isLoading || !isDataChanged}
                   >
-                    {isLoading ? "修改中..." : "修改"}
+                    {isLoading ? "修改中" : "修改"}
                   </button>
                 </div>
               </form>

@@ -59,9 +59,7 @@ function CouponList({ coupons, onEdit, onDelete, deletingId, refetch }) {
               <th className="text-center" style={{ color: "white", backgroundColor: "#939393" }}>
                 可使用數量
               </th>
-              <th className="text-center" style={{ color: "white", backgroundColor: "#939393" }}>
-                已使用
-              </th>
+
               <th className="text-center" style={{ color: "white", backgroundColor: "#939393" }}>
                 折扣期間
               </th>
@@ -86,7 +84,7 @@ function CouponList({ coupons, onEdit, onDelete, deletingId, refetch }) {
                   <span className="text-dark">{coupon.discount}折</span>
                 </td>
                 <td className="text-center">{coupon.quantity}</td>
-                <td className="text-center">{coupon.distributed_quantity}</td>
+
                 <td className="text-center">
                   <div className="small">
                     {formatDate(coupon.start_at)} - {formatDate(coupon.end_at)}
@@ -114,7 +112,7 @@ function CouponList({ coupons, onEdit, onDelete, deletingId, refetch }) {
                             role="status"
                             aria-hidden="true"
                           ></span>
-                          更新中...
+                          更新中
                         </>
                       ) : coupon.is_available ? (
                         "啟用中"
