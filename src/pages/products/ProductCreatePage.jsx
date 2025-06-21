@@ -145,7 +145,7 @@ function ProductCreatePage() {
       selling_price: Number(data.selling_price),
       primary_image: imageUrl,
       images: subImages,
-      hashtags: data.hashtag.map(tag => (tag.startsWith("#") ? tag : `#${tag}`)),
+      hashtags: data.hashtag,
     };
 
     try {
@@ -245,28 +245,79 @@ function ProductCreatePage() {
                     )}
                   </div>
                   {/* 副圖 images */}
+                  {/* 副圖 images */}
                   <div className="d-flex flex-column align-items-center gap-4">
                     <label className="form-label fw-bold text-gray-500 m-0">
                       商品其他圖片（可多選）
                     </label>
+
                     {/* 圖片預覽 + 上傳按鈕 */}
                     <div className="d-flex justify-content-center gap-2 flex-wrap">
                       {subImages.map((url, index) => (
-                        <div key={index}>
-                          <img
-                            src={url}
-                            alt={`副圖 ${index + 1}`}
-                            style={{
-                              width: "100px",
-                              height: "100px",
-                              objectFit: "cover",
-                              border: "1px solid #ccc",
-                              borderRadius: 4,
+                        <div key={index} style={{ position: "relative" }}>
+                          <label
+                            htmlFor={`replaceImageInput-${index}`}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <img
+                              src={url}
+                              alt={`副圖 ${index + 1}`}
+                              style={{
+                                width: "100px",
+                                height: "100px",
+                                objectFit: "cover",
+                                border: "1px solid #ccc",
+                                borderRadius: 4,
+                              }}
+                            />
+                          </label>
+
+                          {/* 刪除按鈕 */}
+                          <button
+                            type="button"
+                            className="btn btn-lg fs-1 fw-bold text-danger shadow-none border-0 position-absolute top-0 end-0"
+                            style={{ transform: "translate(45%, -50%)" }}
+                            alt="刪除圖片"
+                            onClick={() => {
+                              const updated = [...subImages];
+                              updated.splice(index, 1);
+                              setSubImages(updated);
+                            }}
+                          >
+                            ×
+                          </button>
+
+                          {/* 單張替換 input */}
+                          <input
+                            id={`replaceImageInput-${index}`}
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={async e => {
+                              const file = e.target.files[0];
+                              if (!file) return;
+                              setIsUploadingSubImages(true);
+                              const formData = new FormData();
+                              formData.append("files", file);
+                              try {
+                                const res = await uploadImage(formData).unwrap();
+                                const newUrl = res.data.image_urls[0];
+                                const updated = [...subImages];
+                                updated[index] = newUrl;
+                                setSubImages(updated);
+                                toast.success("圖片已更新");
+                              } catch (err) {
+                                console.error("圖片上傳失敗", err);
+                                toast.error("圖片更新失敗");
+                              }
+                              setIsUploadingSubImages(false);
                             }}
                           />
                         </div>
                       ))}
-                      {subImages.length < 5 && (
+
+                      {/* 新增圖片按鈕 */}
+                      {subImages.length < 4 && (
                         <label htmlFor="subImagesInput" style={{ cursor: "pointer" }}>
                           <img
                             src={`${ADMIN_APP_BASE}uploadImage.png`}
@@ -283,7 +334,10 @@ function ProductCreatePage() {
                         </label>
                       )}
                     </div>
+
                     {isUploadingSubImages && <div className="text-muted small">圖片上傳中...</div>}
+
+                    {/* 多張上傳 input */}
                     <input
                       id="subImagesInput"
                       type="file"
@@ -292,8 +346,8 @@ function ProductCreatePage() {
                       style={{ display: "none" }}
                       onChange={async e => {
                         const files = Array.from(e.target.files);
-                        if (subImages.length + files.length > 5) {
-                          return toast.error("最多只能上傳 5 張圖片");
+                        if (subImages.length + files.length > 4) {
+                          return toast.error("最多只能上傳 4 張圖片");
                         }
                         setIsUploadingSubImages(true);
                         const uploadedUrls = [];

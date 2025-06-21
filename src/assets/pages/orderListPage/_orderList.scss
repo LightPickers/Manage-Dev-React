@@ -1,0 +1,104 @@
+@use "../../stylesheets/fonts" as fonts;
+@use "../../stylesheets/colors" as colors;
+@use "../../stylesheets/sizes" as sizes;
+
+// 使用者列表
+.order-list-contents {
+  // 去除預設底線
+  .table > :not(caption) > * > * {
+    border-bottom-width: 0;
+  }
+  .btn-custom-primary.text-danger:hover {
+    background-color: #f8d7da;
+  }
+  .text-multiline-truncate {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .order-list-table-mobile {
+    display: none;
+
+    @include lg {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 20px;
+
+      .text-multiline-truncate {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+  .order-list-table {
+    display: table;
+
+    @include lg {
+      display: none;
+    }
+    .order-list-table-head {
+      th {
+        background-color: transparent;
+        padding: 0 8px 12px 8px;
+        border: 0;
+        text-align: center;
+      }
+      th p {
+        background-color: colors.$gray-200;
+        border-radius: 4px;
+        padding: 8px 12px;
+        color: colors.$gray-600;
+      }
+    }
+    .order-list-table-body {
+      .order-list-item-last {
+        border-color: colors.$gray-100;
+        font-weight: bold;
+      }
+      td {
+        border-bottom: 1px solid colors.$gray-100;
+        padding: 12px 8px;
+        background-color: transparent;
+        text-align: center;
+      }
+    }
+  }
+}
+
+// 頁碼
+.pagination {
+  .page-item {
+    &.disabled .page-link {
+      color: colors.$gray-200;
+      pointer-events: none;
+    }
+
+    &.active .page-link {
+      color: colors.$primary-600;
+      background-color: transparent;
+      border: none;
+      text-decoration: underline;
+      pointer-events: none;
+    }
+  }
+
+  .page-link {
+    color: colors.$gray-600;
+    font-weight: bold;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      color: colors.$primary-400;
+    }
+  }
+}

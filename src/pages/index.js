@@ -14,6 +14,7 @@ export { default as CouponEditPage } from "@pages/coupons/CouponEditPage";
 
 // orders
 export { default as OrderListPage } from "@pages/orders/OrderListPage";
+export { default as OrderDetailsPage } from "@pages/orders/OrderDetailsPage";
 
 // users
 export { default as UserListPage } from "@pages/users/UserListPage";
