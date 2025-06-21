@@ -1,0 +1,248 @@
+// 設定樣式時，盡量不要直接對元素 (h1、h2...) 設定
+// 而是另設定一個標籤 (.h1、.h2) 來設定，才不會影響全域唷
+
+@use "../stylesheets/fonts" as fonts;
+@use "../stylesheets/sizes" as sizes;
+@use "../stylesheets/colors" as colors;
+@use "../stylesheets/line-height" as lh;
+
+// 全域設定
+body {
+  font-family: fonts.$font-family-sans-serif;
+  font-weight: fonts.$font-weight-normal;
+  line-height: lh.$line-height-base;
+  color: colors.$primary-1000;
+  background-color: colors.$gray-100;
+  margin-top: 88px; // 預留導覽列空間
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  text-decoration: none;
+}
+
+textarea {
+  resize: none;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+// 若需要文字底部空間，可置 spacer 設置
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-bottom: 0;
+}
+
+// 標題
+.h1 {
+  font-size: sizes.$h1-font-size;
+  letter-spacing: 0.16em;
+  @include media-breakpoint-down(md) {
+    font-size: sizes.$h2-font-size;
+    letter-spacing: 0.14em;
+  }
+  @include media-breakpoint-down(xs) {
+    font-size: sizes.$h3-font-size;
+    letter-spacing: 0.13em;
+  }
+}
+.h2 {
+  font-size: sizes.$h2-font-size;
+  letter-spacing: 0.14em;
+  @include media-breakpoint-down(xs) {
+    font-size: sizes.$h3-font-size;
+    letter-spacing: 0.13em;
+  }
+}
+.h3 {
+  font-size: sizes.$h3-font-size;
+  letter-spacing: 0.13em;
+  @include media-breakpoint-down(md) {
+    font-size: sizes.$h4-font-size;
+    letter-spacing: 0.12em;
+  }
+  @include media-breakpoint-down(xs) {
+    font-size: sizes.$h5-font-size;
+    letter-spacing: 0.1em;
+  }
+}
+.h4 {
+  font-size: sizes.$h4-font-size;
+  letter-spacing: 0.12em;
+  @include media-breakpoint-down(md) {
+    font-size: sizes.$h5-font-size;
+    letter-spacing: 0.1em;
+  }
+  @include media-breakpoint-down(xs) {
+    font-size: sizes.$h6-font-size;
+    letter-spacing: 0.09em;
+  }
+}
+.h5 {
+  font-size: sizes.$h5-font-size;
+  letter-spacing: 0.1em;
+  @include media-breakpoint-down(xs) {
+    font-size: sizes.$h6-font-size;
+    letter-spacing: 0.09em;
+  }
+}
+.h6 {
+  font-size: sizes.$h6-font-size;
+  letter-spacing: 0.09em;
+}
+
+.heading-serif {
+  font-family: fonts.$headings-font-family;
+  line-height: lh.$line-height-sm;
+}
+.heading-sans {
+  font-family: fonts.$font-family-sans-serif;
+  line-height: lh.$line-height-sm;
+}
+
+// 文字
+.text-sans {
+  color: colors.$gray-500;
+  font-weight: fonts.$font-weight-bold;
+}
+
+// 連結樣式
+.link-text {
+  color: colors.$gray-500;
+  font-weight: fonts.$font-weight-bold;
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: colors.$primary-600;
+  }
+
+  &:active {
+    color: colors.$primary-600;
+  }
+
+  &:focus-visible {
+    outline: 1px dashed colors.$primary-400;
+    outline-offset: 4px;
+  }
+
+  &.is-active {
+    color: colors.$primary-600;
+  }
+
+  &.is-disabled {
+    color: colors.$gray-200;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}
+
+.text-l {
+  font-size: sizes.$h5-font-size;
+  letter-spacing: 0.1em;
+}
+.text-m {
+  font-size: sizes.$h6-font-size;
+  letter-spacing: 0.09em;
+}
+.text-s {
+  font-size: sizes.$small-font-size;
+  letter-spacing: 0.07em;
+}
+.label {
+  font-size: sizes.$label-font-size;
+  letter-spacing: 0.12em;
+}
+
+.fw-bold {
+  font-weight: fonts.$font-weight-bold;
+}
+
+// 圖片
+.object-fit-cover {
+  object-fit: cover;
+}
+
+// 必填星號
+.required::after {
+  content: "*";
+  color: colors.$danger;
+  margin-left: 4px;
+}
+
+// 標題裝飾
+.heading-em-dash {
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 0.75rem;
+    width: 120px;
+    height: 1px;
+    background-color: colors.$gray-400;
+  }
+}
+
+// 兩行截斷
+.line-clamp-2 {
+  display: -webkit-box;
+  display: box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  box-orient: vertical;
+  overflow: hidden;
+}
+
+// 刪除按鈕
+.delete-btn {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 4px;
+  margin-right: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 標題下底線
+.divider-line {
+  border-bottom: 1px solid colors.$gray-200;
+}
+
+// quill 樣式
+.ql-tooltip {
+  display: none;
+}
+.quill-wrapper .ql-editor::before {
+  font-style: normal;
+  color: #6c757d;
+}
+.quill-wrapper .ql-toolbar.ql-snow {
+  border: 0;
+}
+
+.quill-wrapper .ql-editor {
+  resize: vertical;
+  min-height: 200px;
+  overflow: auto;
+  background-color: #fff;
+}

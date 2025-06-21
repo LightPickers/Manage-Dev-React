@@ -1,0 +1,50 @@
+// Color system
+
+// Primary colors
+$primary-100: #edf4f6;
+$primary-200: #d8e8e8;
+$primary-400: #b3cbcd;
+$primary-600: #8bb0b7;
+$primary-800: #4a6465;
+$primary-1000: #313e40;
+
+// Status colors
+$success: #b1dfca;
+$danger: #f48282;
+
+// Gray scale
+$white: #ffffff;
+$gray-100: #f2f2f2;
+$gray-200: #d4d4d4;
+$gray-400: #939393;
+$gray-500: #65574a; // link default
+$gray-600: #5b5b5b;
+$gray-800: #333333;
+$gray-1000: #212121;
+
+$theme-colors: (
+  // primary
+  "primary-100": $primary-100,
+  "primary-200": $primary-200,
+  "primary-400": $primary-400,
+  "primary-600": $primary-600,
+  "primary-800": $primary-800,
+  "primary-1000": $primary-1000,
+  // status
+  "success": $success,
+  "danger": $danger,
+  // gray scale
+  "white": $white,
+  "gray-100": $gray-100,
+  "gray-200": $gray-200,
+  "gray-400": $gray-400,
+  "gray-500": $gray-500,
+  "gray-600": $gray-600,
+  "gray-800": $gray-800,
+  "gray-1000": $gray-1000
+);
+
+// anchor elements
+// $link-color: $gray-500;
+// //$link-hover-color: $primary-600;
+// $btn-link-disabled-color: $gray-200;

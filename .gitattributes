@@ -1,0 +1,27 @@
+# 設定文字檔統一換行符為 LF（跨平台一致）
+* text=auto eol=lf
+
+# 明確設定對某些副檔名為文字
+*.js     text eol=lf
+*.jsx    text eol=lf
+*.json   text eol=lf
+*.css    text eol=lf
+*.scss   text eol=lf
+*.html   text eol=lf
+*.md     text eol=lf
+
+# 強制忽略打包或二進位檔案的 diff
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.webp   binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary
+*.eot    binary
+*.mp4    binary
+*.mp3    binary
+
+# 可選：告訴 GitHub 這是 JavaScript 為主的專案
+*.js linguist-language=JavaScript
