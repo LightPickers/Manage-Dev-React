@@ -55,19 +55,18 @@ function CouponCreatePage() {
         quantity: Number(data.quantity),
         code: data.code,
         distributed_quantity: Number(data.distributedQuantity) || 1,
-        start_at: new Date(data.start_at + "T00:00:00").toISOString(),
-        end_at: new Date(data.end_at + "T23:59:59").toISOString(),
+        start_at: new Date(data.start_at).toISOString(),
+        end_at: new Date(data.end_at).toISOString(),
         is_available: true,
       };
-
-      console.log("提交的 payload:", payload);
 
       await createCoupon(payload).unwrap();
       toast.success("優惠券新增成功");
       navigate("/coupons");
     } catch (error) {
       console.error("新增失敗", error);
-      toast.error("優惠券新增失敗");
+      const errorMessage = error?.data?.message || "優惠券新增失敗";
+      toast.error(`${errorMessage}`);
     }
   };
 
@@ -218,54 +217,7 @@ function CouponCreatePage() {
 
                   {/* 每個買家最大配額 */}
                   <div className="row g-3 mt-3">
-                    <div className="col-md-3">
-                      <label className="form-label">每個買家最大配額</label>
-                      <div className="d-flex align-items-center">
-                        <button
-                          type="button"
-                          className="btn btn-outline-secondary d-flex align-items-center justify-content-center"
-                          style={{ width: "40px", height: "40px" }}
-                          onClick={() => handleQuantityChange(-1)}
-                        >
-                          −
-                        </button>
-                        <input
-                          type="number"
-                          className={`form-control mx-2 text-center ${errors.distributedQuantity ? "is-invalid" : ""}`}
-                          placeholder="請輸入數字"
-                          min="1"
-                          step="1"
-                          onWheel={e => e.target.blur()}
-                          onInput={e => {
-                            e.target.value = e.target.value.replace(/[^0-9]/g, "");
-                          }}
-                          {...register("distributedQuantity", {
-                            required: "請輸入每個買家最大配額",
-                            min: {
-                              value: 1,
-                              message: "配額不能小於1",
-                            },
-                            pattern: {
-                              value: /^[1-9]\d*$/,
-                              message: "配額必須為正整數",
-                            },
-                          })}
-                        />
-                        <button
-                          type="button"
-                          className="btn btn-outline-secondary d-flex align-items-center justify-content-center"
-                          style={{ width: "40px", height: "40px" }}
-                          onClick={() => handleQuantityChange(1)}
-                        >
-                          +
-                        </button>
-                      </div>
-                      {errors.distributedQuantity && (
-                        <div className="invalid-feedback d-block">
-                          {errors.distributedQuantity.message}
-                        </div>
-                      )}
-                    </div>
+                    <label className="form-label">每個買家最大配額 : 1</label>
                   </div>
                 </div>
 
@@ -319,7 +271,7 @@ function CouponCreatePage() {
                     className="btn coupon-btn-submit px-4 rounded-pill"
                     disabled={isLoading}
                   >
-                    {isLoading ? "新增中..." : "新增"}
+                    {isLoading ? "新增中" : "新增"}
                   </button>
                 </div>
               </form>
