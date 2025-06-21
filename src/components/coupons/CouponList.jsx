@@ -8,13 +8,18 @@ function CouponList({ coupons, onEdit, onDelete, deletingId, refetch }) {
   const [toggleCouponActiveStatus] = useToggleCouponActiveStatusMutation();
   const [updatingId, setUpdatingId] = useState(null);
 
+  // const formatDate = dateString => {
+  //   if (!dateString) return "無";
+  //   return new Date(dateString).toLocaleDateString("zh-TW", {
+  //     year: "numeric",
+  //     month: "numeric",
+  //     day: "numeric",
+  //   });
+  // };
   const formatDate = dateString => {
     if (!dateString) return "無";
-    return new Date(dateString).toLocaleDateString("zh-TW", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-    });
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // 保留原始 UTC 日期
   };
 
   const handleToggleStatus = async coupon => {
