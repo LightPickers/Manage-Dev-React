@@ -1,4 +1,4 @@
-# 「拾光堂」 - 二手攝影器材交易平台
+# 「拾光堂」 - 二手攝影器材交易平台（管理者介面）
 
 [![LightPickers Logo](https://raw.githubusercontent.com/LightPickers/Frontend-Dev-React/refs/heads/feature/header/public/homepage/banner/banner-2-lg.png)](https://lightpickers.github.io/Frontend-Dev-React/#/)
 
@@ -20,10 +20,10 @@
 
 ```bash
 # 1. 複製專案
-git clone https://github.com/LightPickers/Frontend-Dev-React.git
+git clone https://github.com/LightPickers/Manage-Dev-React.git
 
 # 2. 進入專案目錄
-cd Frontend-Dev-React
+cd Manage-Dev-React
 
 # 3. 安裝套件
 npm install
@@ -43,14 +43,10 @@ npm run dev
 
 為方便測試，以下提供測試資訊：
 
-|  項目  |              測試用內容 |
-| :----: | ----------------------: |
-|  帳號  | `example1223@gmail.com` |
-|  密碼  |           `ASSffff8972` |
-| 優惠券 |            `2025summer` |
-|  卡號  |   `4000 2211 1111 1111` |
-| 到期日 |                 `01/28` |
-| 安全碼 |                   `111` |
+| 項目 |        測試用內容 |
+| :--: | ----------------: |
+| 帳號 | `admin@gmail.com` |
+| 密碼 |       `Admin1234` |
 
 ## 主要功能
 
@@ -122,14 +118,14 @@ npm run lint         # 執行 ESLint 檢查
 
 ## 專案團隊
 
-|    成員    |                    GitHub                    |                      Email |
-| :--------: | :------------------------------------------: | -------------------------: |
-| **zxlee**  |  [@zxlee0114](https://github.com/zxlee0114)  | napoleon.lee0114@gmail.com |
-| **Hsiang** | [@Hsiang1006](https://github.com/Hsiang1006) |       fdsa201305@gmail.com |
-|   **TX**   |     [@TXWuuu](https://github.com/TXWuuu)     |           wutx24@gmail.com |
-|  **Rosa**  |  [@Rosaaachi](https://github.com/Rosaaachi)  |          ss91810@gmail.com |
-|  **Tau**   |     [@TauHsu](https://github.com/TauHsu)     |      jason850629@gmail.com |
-| **Angela** | [@Angela-Chu](https://github.com/Angela-Chu) | AngelaChu1598753@gmail.com |
+|    成員    | 職位 |                    GitHub                    |                      Email |
+| :--------: | :--: | :------------------------------------------: | -------------------------: |
+| **zxlee**  | 全端 |  [@zxlee0114](https://github.com/zxlee0114)  | napoleon.lee0114@gmail.com |
+| **Hsiang** | 全端 | [@Hsiang1006](https://github.com/Hsiang1006) |       fdsa201305@gmail.com |
+|   **TX**   | 全端 |     [@TXWuuu](https://github.com/TXWuuu)     |           wutx24@gmail.com |
+|  **Rosa**  | 全端 |  [@Rosaaachi](https://github.com/Rosaaachi)  |          ss91810@gmail.com |
+|  **Tau**   | 後端 |     [@TauHsu](https://github.com/TauHsu)     |      jason850629@gmail.com |
+| **Angela** | 後端 | [@Angela-Chu](https://github.com/Angela-Chu) | AngelaChu1598753@gmail.com |
 
 ---
 
