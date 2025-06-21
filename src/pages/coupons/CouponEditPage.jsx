@@ -116,8 +116,8 @@ function CouponEditPage() {
         quantity: Number(data.quantity),
         code: data.code,
         distributed_quantity: Number(data.distributedQuantity) || 1,
-        start_at: new Date(data.start_at + "T00:00:00").toISOString(),
-        end_at: new Date(data.end_at + "T23:59:59").toISOString(),
+        start_at: new Date(data.start_at).toISOString(),
+        end_at: new Date(data.end_at).toISOString(),
         is_available: true,
       };
 
@@ -126,7 +126,8 @@ function CouponEditPage() {
       navigate("/coupons");
     } catch (error) {
       console.error("修改失敗", error);
-      toast.error("優惠券修改失敗");
+      const errorMessage = error?.data?.message || "優惠券修改失敗";
+      toast.error(`${errorMessage}`);
     }
   };
 
