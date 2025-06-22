@@ -39,6 +39,17 @@ npm run dev
 # 訪問 http://localhost:5173/#/
 ```
 
+### 環境變數說明
+
+```bash
+# 後台 APP 部屬路徑（與前台區隔）
+VITE_ADMIN_APP_BASE=/
+# 前台 API 路徑（含版本號）
+VITE_API_BASE=https://api-domain.com/api/v1
+# 後台 API 路徑（含版本號及 admin）
+VITE_ADMIN_API_BASE=https://admin-api-domain.com/api/v1/admin
+```
+
 ### 測試帳號
 
 為方便測試，以下提供測試資訊：
