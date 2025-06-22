@@ -6,23 +6,22 @@
   color: colors.$gray-800;
 }
 
-div:where(.swal2-container) div:where(.swal2-html-container) {
-  overflow-x: hidden !important;
-  text-wrap: balance;
-}
-
 div:where(.swal2-icon) {
   margin: 1em auto 0.6em !important;
 
-  // &.swal2-warning {
-  //   border-color: colors.$warning !important;
-  //   color: colors.$warning !important;
-  // }
+  &.swal2-warning {
+    border-color: colors.$danger !important; // 改為紅色邊框
+    color: colors.$danger !important; // 改為紅色文字
+  }
 
   &.swal2-success {
     border-color: colors.$success !important;
     color: colors.$success !important;
   }
+}
+
+div:where(.swal2-icon).swal2-warning .swal2-icon-content {
+  color: colors.$danger !important; // 驚嘆號內容改為紅色
 }
 
 div:where(.swal2-icon).swal2-success [class^="swal2-success-circular-line"][class$="left"],
@@ -46,14 +45,14 @@ div:where(.swal2-container) div:where(.swal2-actions) {
 .alert-success-button,
 .alert-info-button,
 .alert-error-button {
-  border: 1px solid colors.$primary-600;
+  border: 1px solid colors.$danger; // 改為紅色邊框
   padding: 12px 20px;
   margin: 4px;
   width: calc((100% / 2) - 16px);
   color: colors.$gray-100;
   border-radius: 8px;
   cursor: pointer;
-  background-color: colors.$primary-800;
+  background-color: colors.$danger; // 改為紅色背景
   transition:
     background-color 300ms ease-in,
     transform 300ms ease-in-out,
@@ -61,8 +60,8 @@ div:where(.swal2-container) div:where(.swal2-actions) {
 
   &:hover {
     transform: translateY(-1px);
-    background-color: darken($color: colors.$primary-800, $amount: 10%);
-    border-color: colors.$primary-1000;
+    background-color: darken($color: colors.$danger, $amount: 10%); // 深一點的紅色
+    border-color: colors.$danger;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
   }
 
