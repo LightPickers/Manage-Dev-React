@@ -9,6 +9,7 @@ import CouponFilter from "../../components/coupons/CouponFilter";
 import CouponList from "../../components/coupons/CouponList";
 import Pagination from "../../components/coupons/Pagination";
 import ConfirmDialog from "../../components/common/ConfirmDialog";
+import { ConfirmDialogue } from "../../components/Alerts";
 
 function CouponListPage() {
   const navigate = useNavigate();
@@ -117,11 +118,23 @@ function CouponListPage() {
     // 找到要刪除的優惠券資訊
     const coupon = allCoupons.find(c => c.id === couponId);
 
-    // 打開確認對話框
-    setConfirmDialog({
-      isOpen: true,
-      couponId: couponId,
-      couponName: coupon?.name || "此優惠券",
+    // 使用 Alerts 組件顯示確認對話框
+    await ConfirmDialogue({
+      title: "確認要刪除",
+      text: `確定要刪除優惠券「${coupon?.name || "此優惠券"}」嗎？此操作無法復原。`,
+      icon: "warning",
+      action: async () => {
+        setDeletingId(couponId);
+        try {
+          await deleteCoupon(couponId).unwrap();
+          toast.success("優惠券已刪除");
+          refetch();
+        } catch {
+          toast.error("刪除失敗，請稍後再試");
+        } finally {
+          setDeletingId(null);
+        }
+      },
     });
   };
 
@@ -249,17 +262,6 @@ function CouponListPage() {
           )}
         </div>
       </div>
-
-      {/* 確認刪除對話框 */}
-      <ConfirmDialog
-        isOpen={confirmDialog.isOpen}
-        onClose={handleCancelDelete}
-        onConfirm={handleConfirmDelete}
-        title="確認要刪除"
-        itemName={confirmDialog.couponName}
-        message="此操作無法復原，請確認是否要刪除此優惠券？"
-        warningMessage="刪除後將無法復原，請確認"
-      />
     </div>
   );
 }

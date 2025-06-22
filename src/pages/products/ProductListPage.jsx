@@ -9,6 +9,7 @@ import {
   useDeleteProductByIdMutation,
 } from "@/features/products/productApi";
 import { useGetProductCategoryQuery } from "@/features/products/productAttributesApi";
+import { ConfirmDialogue } from "../../components/Alerts";
 
 function ProductListPage() {
   const navigate = useNavigate();
@@ -103,19 +104,25 @@ function ProductListPage() {
 
   // 刪除商品
   const handleDeleteProduct = async productId => {
-    if (window.confirm("確定要刪除此商品嗎？")) {
-      try {
-        const result = await deleteProduct(productId).unwrap();
-        if (result.status === "true" || result.status === true) {
-          toast.success("商品刪除成功");
-        } else {
-          toast.error("刪除失敗");
+    // 使用 Alerts 組件顯示確認對話框
+    await ConfirmDialogue({
+      title: "確認要刪除",
+      text: "確定要刪除此商品嗎？此操作無法復原。",
+      icon: "warning",
+      action: async () => {
+        try {
+          const result = await deleteProduct(productId).unwrap();
+          if (result.status === "true" || result.status === true) {
+            toast.success("商品刪除成功");
+          } else {
+            toast.error("刪除失敗");
+          }
+        } catch (error) {
+          console.error("刪除錯誤:", error);
+          toast.error(`刪除失敗: ${error?.data?.message || error.message}`);
         }
-      } catch (error) {
-        console.error("刪除錯誤:", error);
-        toast.error(`刪除失敗: ${error?.data?.message || error.message}`);
-      }
-    }
+      },
+    });
   };
 
   const getProductStatus = product => {
