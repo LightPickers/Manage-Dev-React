@@ -23,7 +23,7 @@ export const userApi = createApi({
     }),
     // 取得使用者列表
     getUsers: builder.query({
-      query: ({ page, per, keyword = "" } = {}) => {
+      query: ({ page = 1, per = 10, keyword = "" } = {}) => {
         const params = new URLSearchParams({ page, per, keyword });
         return `/users?${params.toString()}`;
       },

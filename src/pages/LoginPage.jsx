@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 import { setCredentials } from "../features/auth/authSlice";
@@ -17,7 +17,19 @@ function LoginPage() {
   const [login] = useLoginMutation();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const hasRedirected = useRef(false);
   const dispatch = useDispatch();
+
+  const { token } = useSelector(state => state.auth);
+
+  useEffect(() => {
+    if (token && location.pathname === "/login" && !hasRedirected.current) {
+      toast.info("您已登入，將自動導向後台首頁");
+      hasRedirected.current = true;
+      navigate("/dashboard", { replace: true });
+    }
+  }, [token, location.pathname, navigate]);
 
   const ADMIN_APP_BASE = import.meta.env.VITE_ADMIN_APP_BASE;
   const { screenWidth } = useScreenSize();
