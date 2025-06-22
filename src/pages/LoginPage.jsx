@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 import { setCredentials } from "../features/auth/authSlice";
@@ -17,7 +17,19 @@ function LoginPage() {
   const [login] = useLoginMutation();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const hasRedirected = useRef(false);
   const dispatch = useDispatch();
+
+  const { token } = useSelector(state => state.auth);
+
+  useEffect(() => {
+    if (token && location.pathname === "/login" && !hasRedirected.current) {
+      toast.info("您已登入，將自動導向後台首頁");
+      hasRedirected.current = true;
+      navigate("/dashboard", { replace: true });
+    }
+  }, [token, location.pathname, navigate]);
 
   const ADMIN_APP_BASE = import.meta.env.VITE_ADMIN_APP_BASE;
   const { screenWidth } = useScreenSize();
@@ -50,25 +62,51 @@ function LoginPage() {
   };
 
   return (
-    <div className="container-fluid loginPage vh-100 p-0" style={{ marginTop: "-88px" }}>
-      {isMobile && (
-        <div className="tipBox position-absolute top-0 start-50 translate-middle-x mt-3 px-3 py-2 bg-white bg-opacity-90 rounded">
-          <span className="material-icons-outlined align-content-center me-2 fs-6">info</span>
-          <small>建議使用裝置解析度寬1440px以上</small>
-        </div>
-      )}
-      <div className="row h-100 g-0">
-        <div className="col-md-6 h-100">
-          <div className="AdminLogo h-100 position-relative overflow-hidden">
-            <img
-              src={`${ADMIN_APP_BASE}login.jpg`}
-              alt="拾光堂 Admin Login"
-              className="w-100 h-100"
-              style={{ objectFit: "cover", objectPosition: "center" }}
-            />
+    <div
+      className="container-fluid loginPage vh-100 p-0 d-flex align-items-center justify-content-center"
+      style={{ marginTop: "-88px" }}
+    >
+      <div className="row w-100 h-100 g-0">
+        {/* 圖片區塊 */}
+        {screenWidth >= 768 && (
+          <div className="col-md-6 h-100">
+            <div className="AdminLogo h-100 position-relative overflow-hidden">
+              <img
+                src={`${ADMIN_APP_BASE}login.jpg`}
+                alt="拾光堂 Admin Login"
+                className="w-100 h-100"
+                style={{ objectFit: "cover", objectPosition: "center" }}
+              />
+            </div>
           </div>
-        </div>
-        <div className="col-md-6 h-100 d-flex align-items-center justify-content-center">
+        )}
+        <div
+          className={`${
+            screenWidth >= 768 ? "col-md-6" : "col-12"
+          } h-100 d-flex align-items-center justify-content-center position-relative`}
+        >
+          {/* 警示區塊 */}
+          {isMobile && (
+            <div
+              className="tipBox d-flex align-items-center justify-content-center position-absolute"
+              style={{
+                top: "10%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                padding: "10px 15px",
+                borderRadius: "8px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                zIndex: 10,
+              }}
+            >
+              <span
+                className="material-icons-outlined align-content-center me-2"
+                style={{ fontSize: "16px", verticalAlign: "middle" }}
+              ></span>
+              <small>建議使用裝置解析度寬1440px以上</small>
+            </div>
+          )}
           <div className="login-content" style={{ maxWidth: "360px", width: "100%" }}>
             <div className="text-center mb-4">
               <h1 className="h3 mb-2 text-dark">拾光堂後台管理系統</h1>
@@ -110,6 +148,10 @@ function LoginPage() {
                   style={{ height: "48px" }}
                   {...register("password", {
                     required: "請填寫密碼",
+                    pattern: {
+                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,16}$/, // 密碼規則
+                      message: "密碼需包含大小寫字母和數字，長度為8-16字",
+                    },
                   })}
                 />
                 <label htmlFor="password">Password</label>
@@ -138,7 +180,7 @@ function LoginPage() {
                     <div className="spinner-border spinner-border-sm" role="status">
                       <span className="visually-hidden">Loading...</span>
                     </div>
-                    登入中...
+                    登入中
                   </>
                 ) : (
                   "登入"
