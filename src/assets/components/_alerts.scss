@@ -1,0 +1,98 @@
+@use "../stylesheets/fonts" as fonts;
+@use "../stylesheets/colors" as colors;
+@use "../stylesheets/sizes" as sizes;
+
+.alert-title {
+  color: colors.$gray-800;
+}
+
+div:where(.swal2-container) div:where(.swal2-html-container) {
+  overflow-x: hidden !important;
+  text-wrap: balance;
+}
+
+div:where(.swal2-icon) {
+  margin: 1em auto 0.6em !important;
+
+  // &.swal2-warning {
+  //   border-color: colors.$warning !important;
+  //   color: colors.$warning !important;
+  // }
+
+  &.swal2-success {
+    border-color: colors.$success !important;
+    color: colors.$success !important;
+  }
+}
+
+div:where(.swal2-icon).swal2-success [class^="swal2-success-circular-line"][class$="left"],
+div:where(.swal2-icon).swal2-success .swal2-success-fix,
+div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-circular-line-right {
+  background-color: transparent !important;
+}
+
+div:where(.swal2-container) div:where(.swal2-actions) {
+  width: 80% !important;
+}
+
+.alert-popup {
+  border-radius: 12px;
+  border: 1px solid colors.$gray-100;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+}
+
+.alert-confirm-button,
+.alert-success-button,
+.alert-info-button,
+.alert-error-button {
+  border: 1px solid colors.$primary-600;
+  padding: 12px 20px;
+  margin: 4px;
+  width: calc((100% / 2) - 16px);
+  color: colors.$gray-100;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: colors.$primary-800;
+  transition:
+    background-color 300ms ease-in,
+    transform 300ms ease-in-out,
+    box-shadow 300ms ease-in;
+
+  &:hover {
+    transform: translateY(-1px);
+    background-color: darken($color: colors.$primary-800, $amount: 10%);
+    border-color: colors.$primary-1000;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.alert-cancel-button {
+  border: 1px solid colors.$primary-800;
+  padding: 12px 20px;
+  margin: 4px;
+  width: calc((100% / 2) - 16px);
+  color: colors.$primary-800;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: transparent;
+  transition:
+    background-color 300ms ease-in,
+    transform 300ms ease-in-out,
+    box-shadow 300ms ease-in;
+
+  &:hover {
+    transform: translateY(-1px);
+    background-color: rgba($color: colors.$primary-100, $alpha: 0.8);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  }
+  &:focus {
+    transform: translateY(1px);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  }
+}
