@@ -231,6 +231,7 @@ function CouponCreatePage() {
                       <input
                         type="date"
                         className={`form-control ${errors.start_at ? "is-invalid" : ""}`}
+                        min={new Date().toISOString().split("T")[0]} // 限制開始日期不能早於今天
                         {...register("start_at", {
                           required: "請選擇開始日期",
                         })}
@@ -246,6 +247,7 @@ function CouponCreatePage() {
                       <input
                         type="date"
                         className={`form-control ${errors.end_at ? "is-invalid" : ""}`}
+                        min={new Date().toISOString().split("T")[0]} // 限制結束日期不能早於今天
                         {...register("end_at", {
                           required: "請選擇結束日期",
                         })}
