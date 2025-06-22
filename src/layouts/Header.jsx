@@ -28,6 +28,7 @@ function Header() {
   }, []);
 
   const handleLogout = () => {
+    localStorage.setItem("justLoggedOut", "true");
     dispatch(logout());
     localStorage.removeItem("token");
 
