@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import AdminLayout from "@layouts/AdminLayout";
 import Footer from "@layouts/Footer";
 import Header from "@layouts/Header";
-
+import { AuthProvider } from "@components/AuthProvider";
 import { setVerified } from "./features/auth/authSlice";
 
 function LightPickersAdminApp() {
@@ -16,13 +16,15 @@ function LightPickersAdminApp() {
   }, [dispatch]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "85vh" }}>
-      <Header />
-      <div style={{ flex: 1 }}>
-        <Outlet />
+    <AuthProvider>
+      <div style={{ display: "flex", flexDirection: "column", minHeight: "85vh" }}>
+        <Header />
+        <div style={{ flex: 1 }}>
+          <Outlet />
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </AuthProvider>
   );
 }
 

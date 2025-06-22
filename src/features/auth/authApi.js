@@ -20,7 +20,13 @@ export const authApi = createApi({
         body: credentials,
       }),
     }),
+    verifyAdmin: builder.query({
+      query: () => ({
+        url: "/users/auth/verify", // 👈 新增的後端路由
+        method: "POST",
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation, useLazyVerifyAdminQuery } = authApi;

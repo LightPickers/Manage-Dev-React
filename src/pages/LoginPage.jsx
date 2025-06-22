@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 import { setCredentials } from "../features/auth/authSlice";
@@ -17,7 +17,19 @@ function LoginPage() {
   const [login] = useLoginMutation();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const hasRedirected = useRef(false);
   const dispatch = useDispatch();
+
+  const { token } = useSelector(state => state.auth);
+
+  useEffect(() => {
+    if (token && location.pathname === "/login" && !hasRedirected.current) {
+      toast.info("您已登入，將自動導向後台首頁");
+      hasRedirected.current = true;
+      navigate("/dashboard", { replace: true });
+    }
+  }, [token, location.pathname, navigate]);
 
   const ADMIN_APP_BASE = import.meta.env.VITE_ADMIN_APP_BASE;
   const { screenWidth } = useScreenSize();
@@ -51,12 +63,6 @@ function LoginPage() {
 
   return (
     <div className="container-fluid loginPage vh-100 p-0" style={{ marginTop: "-88px" }}>
-      {isMobile && (
-        <div className="tipBox position-absolute top-0 start-50 translate-middle-x mt-3 px-3 py-2 bg-white bg-opacity-90 rounded">
-          <span className="material-icons-outlined align-content-center me-2 fs-6">info</span>
-          <small>建議使用裝置解析度寬1440px以上</small>
-        </div>
-      )}
       <div className="row h-100 g-0">
         <div className="col-md-6 h-100">
           <div className="AdminLogo h-100 position-relative overflow-hidden">
