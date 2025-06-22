@@ -1,0 +1,47 @@
+import { node } from "prop-types";
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+
+import { setVerified } from "@features/auth/authSlice";
+import { useLazyVerifyAdminQuery } from "@features/auth/authApi";
+
+// 檢查應用初始化時是否有 token
+export function AuthProvider({ children }) {
+  const dispatch = useDispatch();
+  const { token, isLoading } = useSelector(state => state.auth);
+  const [verifyAuth, { isLoading: isVerifying }] = useLazyVerifyAdminQuery();
+  const location = useLocation();
+  const hasCheckedAuth = useRef(false);
+
+  // 若有 token，通過 RTK query 的 verifyAuth() 驗證
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (token) {
+        try {
+          await verifyAuth().unwrap();
+        } catch {
+          dispatch(setVerified());
+        }
+      } else {
+        const justLoggedOut = localStorage.getItem("justLoggedOut") === "true";
+        if (!hasCheckedAuth.current && location.pathname !== "/login" && !justLoggedOut) {
+          toast.error("您無權進入此頁面，請重新登入");
+          hasCheckedAuth.current = true;
+        }
+        if (justLoggedOut) {
+          localStorage.removeItem("justLoggedOut");
+        }
+        dispatch(setVerified());
+      }
+    };
+    checkAuth();
+  }, [dispatch, token, verifyAuth, location.pathname]);
+
+  return <>{children}</>;
+}
+
+AuthProvider.propTypes = {
+  children: node.isRequired,
+};
