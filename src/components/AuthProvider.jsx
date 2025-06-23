@@ -21,8 +21,13 @@ export function AuthProvider({ children }) {
       if (token) {
         try {
           await verifyAuth().unwrap();
-        } catch {
-          dispatch(setVerified());
+          hasCheckedAuth.current = true;
+        } catch (err) {
+          localStorage.removeItem("persist:root");
+          dispatch({ type: "auth/logout" });
+          const errorMessage = err?.data?.message || "登入已失效，請重新登入";
+          toast.error(errorMessage);
+          hasCheckedAuth.current = true;
         }
       } else {
         const justLoggedOut = localStorage.getItem("justLoggedOut") === "true";
@@ -37,6 +42,14 @@ export function AuthProvider({ children }) {
       }
     };
     checkAuth();
+
+    const interval = setInterval(
+      () => {
+        if (token) verifyAuth();
+      },
+      10 * 60 * 1000
+    );
+    return () => clearInterval(interval);
   }, [dispatch, token, verifyAuth, location.pathname]);
 
   return <>{children}</>;
